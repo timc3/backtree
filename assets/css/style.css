@@ -1,0 +1,8 @@
+/* 
+  Base style for BackTree
+*/
+#backtree ul {
+  list-style: disc;
+  padding-left: 10px;
+  margin: 0 0 0 8px;
+}
