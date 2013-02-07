@@ -1,8 +1,85 @@
 /* 
   Base style for BackTree
 */
+#backtree {
+  border-left: 2px solid #dddddd;
+  border-right: 2px solid #dddddd;
+  /* Used for placing over the element */
+
+}
 #backtree ul {
-  list-style: disc;
-  padding-left: 10px;
-  margin: 0 0 0 8px;
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+#backtree ul li {
+  line-height: 22px;
+}
+#backtree ul li .bt-node {
+  margin-top: 1px;
+}
+#backtree ul li .bt-node .bt-icon,
+#backtree ul li .bt-node .bt-type-collection {
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  line-height: 10px;
+  display: inline-block;
+  background: url(../img/backtree_sprite.png) no-repeat left top;
+  padding: 0;
+  clear: none;
+}
+#backtree ul li .bt-node .bt-type-collection {
+  background-position: 0 -61px;
+  margin: 0 0 0 4px;
+}
+#backtree ul li .bt-node .bt-type-collection:active {
+  background-position: -64px -61px;
+}
+#backtree ul li .bt-node .bt-type-collection-open {
+  background-position: 0 -93px;
+}
+#backtree ul li .bt-node .bt-type-collection-open:active {
+  background-position: -64px -93px;
+}
+#backtree ul li .bt-node .bt-icon {
+  margin: 0 4px -1px 0;
+  height: 18px;
+  background-position: -128px -28px;
+}
+#backtree ul li .bt-node .bt-icon-collection-open {
+  background-position: -128px 3px;
+}
+#backtree ul li .bt-node:hover {
+  background-color: #dddddd;
+}
+#backtree ul li .bt-node-selected:active {
+  background: #b6caca;
+  background: -moz-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #b6caca), color-stop(2%, #4d576d), color-stop(98%, #3c4352), color-stop(100%, #1b222f));
+  background: -webkit-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  background: -o-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  background: -ms-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  background: linear-gradient(to bottom, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#b6caca', endColorstr='#1b222f', GradientType=0);
+}
+#backtree ul li .bt-node-selected {
+  color: white;
+  background: #edf2f2;
+  background: -moz-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #edf2f2), color-stop(2%, #606c88), color-stop(98%, #4b5366), color-stop(100%, #222a3a));
+  background: -webkit-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  background: -o-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  background: -ms-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  background: linear-gradient(to bottom, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#edf2f2', endColorstr='#222a3a', GradientType=0);
+}
+#backtree ul li .bt-node-selected .bt-type-collection {
+  background-position: -96px -61px;
+}
+#backtree ul li .bt-node-selected .bt-type-collection-open {
+  background-position: -96px -93px;
+}
+#backtree ul ul.backtreespacer {
+  padding-left: 8px;
 }
