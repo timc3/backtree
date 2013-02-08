@@ -28,6 +28,11 @@ _.extend(EventCoordinator.prototype, {
       if (this.subfunction !== undefined){
         this.subfunction(this.topicPrefix + topic, callback); 
       }
+    },
+    unsubscribe: function(topic, callback){
+      if (this.subfunction !== undefined){
+        this.unsubfunction(this.topPrefix + topic, callback);
+      }
     }
 });
 

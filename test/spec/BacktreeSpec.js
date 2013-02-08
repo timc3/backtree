@@ -149,12 +149,24 @@ describe("Basic Backtree Usage", function() {
 
   });
 
-  it("", function(){
-
-  });
-
-  xit("selecting node view should raise an event", function(){
-    
+  describe("events in backtree", function(){
+    it("should send a pubsub event when selecting a branch", function(){
+      var x=0;
+      var collectionEl = tree.$('div:contains("Collection 3")');
+      tree.eventCoordinator.subscribe('selected', function(args, model){ x +=1 });
+      collectionEl.click();
+      expect(x).toBe(1);
+    });
+    it("for selecting a node/branch should send a view and an argument", function(){
+      var x={}, y={};
+      var collectionEl = tree.$('div:contains("Collection 3")');
+      tree.eventCoordinator.subscribe('selected', function(args, model){ x=args, y=model; });
+      collectionEl.click();
+      expect(x).not.toBe({});
+      expect(y).not.toBe({});
+      expect(Object.getPrototypeOf(x.view) === backtree.NodeView.prototype).toBe(true);
+      expect(Object.getPrototypeOf(y) === testModel.prototype).toBe(true);
+    });
   });
 
   xit("selecting node view should bind a once event handler to make sure that on another node selecting we take off the selection", function(){
