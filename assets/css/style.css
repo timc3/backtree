@@ -1,6 +1,16 @@
-/* 
-  Base style for BackTree
-*/
+/*  Base style for BackTree */
+/* Mixins */
+.visuallyhidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+/* Actual Styles */
 #backtree {
   border-left: 2px solid #dddddd;
   border-right: 2px solid #dddddd;
@@ -17,9 +27,11 @@
 }
 #backtree ul li .bt-node {
   margin-top: 1px;
+  /* Shows an open icon */
+
 }
 #backtree ul li .bt-node .bt-icon,
-#backtree ul li .bt-node .bt-type-collection {
+#backtree ul li .bt-node .bt-arrow {
   width: 16px;
   height: 16px;
   font-size: 10px;
@@ -29,17 +41,17 @@
   padding: 0;
   clear: none;
 }
-#backtree ul li .bt-node .bt-type-collection {
+#backtree ul li .bt-node .bt-arrow {
   background-position: 0 -61px;
   margin: 0 0 0 4px;
 }
-#backtree ul li .bt-node .bt-type-collection:active {
+#backtree ul li .bt-node .bt-arrow:active {
   background-position: -64px -61px;
 }
-#backtree ul li .bt-node .bt-type-collection-open {
+#backtree ul li .bt-node .bt-arrow-open {
   background-position: 0 -93px;
 }
-#backtree ul li .bt-node .bt-type-collection-open:active {
+#backtree ul li .bt-node .bt-arrow-open:active {
   background-position: -64px -93px;
 }
 #backtree ul li .bt-node .bt-icon {
@@ -47,7 +59,7 @@
   height: 18px;
   background-position: -128px -28px;
 }
-#backtree ul li .bt-node .bt-icon-collection-open {
+#backtree ul li .bt-node .bt-icon-collection-open-icon {
   background-position: -128px 3px;
 }
 #backtree ul li .bt-node:hover {
@@ -74,12 +86,26 @@
   background: linear-gradient(to bottom, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#edf2f2', endColorstr='#222a3a', GradientType=0);
 }
-#backtree ul li .bt-node-selected .bt-type-collection {
+#backtree ul li .bt-node-selected .bt-arrow {
   background-position: -96px -61px;
 }
-#backtree ul li .bt-node-selected .bt-type-collection-open {
+#backtree ul li .bt-node-selected .bt-arrow-open {
   background-position: -96px -93px;
 }
-#backtree ul ul.backtreespacer {
+#backtree ul.bt-node-closed > li > ul {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+#backtree ul.bt-node-closed .bt-node .bt-arrow {
+  background-position: 0 -61px;
+  margin: 0 0 0 4px;
+}
+#backtree ul ul.bt-branch {
   padding-left: 8px;
 }

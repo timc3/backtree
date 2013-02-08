@@ -6,6 +6,31 @@ backtree = root.Backtree = {
   // check if we are using a mobile
   isMobile: (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent))
 }
+var EventCoordinator = backtree.EventCoordinator = function(options){
+  this._configure(options || {});
+};
+_.extend(EventCoordinator.prototype, {
+    _configure: function(options) {
+        if (this.options) options = _.extend({}, _.result(this, 'options'), options);
+        this.options = options;
+        this.pubfunction = options.publist || $.publish || undefined;
+        this.subfunction =  options.subscribe || $.subscribe || undefined;
+        this.unsubfunction = options.unsubscribe || $.unsubscribe || undefined;
+        this.topicPrefix = '/backtree/';
+    },
+    publish: function(event, arguments, model){
+      if (model !== undefined){
+        model.trigger(event, arguments);
+      }
+      this.pubfunction(this.topicPrefix + event, [arguments, model]);
+    },
+    subscribe: function(topic, callback){
+      if (this.subfunction !== undefined){
+        this.subfunction(this.topicPrefix + topic, callback); 
+      }
+    }
+});
+
 backtree.TreeView = Backbone.View.extend({
   /*  Main Tree View 
    *  Represents a tree.
@@ -34,7 +59,6 @@ backtree.TreeView = Backbone.View.extend({
     var args = Array.prototype.slice.apply(arguments);
     Backbone.View.prototype.constructor.apply(this, args);
   
-
     // Bind the initial events ala Marionette.
     this._initialEvents();
   },
@@ -59,11 +83,15 @@ backtree.TreeView = Backbone.View.extend({
     if (options.el !== undefined){
       this.render();
     };
+    this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator();
   },
 
   events: function() {
   },
 
+  eventPublish: function(event, args, model){
+    this.eventCoordinator.publish(event, args, model);
+  },
   render: function(){
     // Give the root element the className we have configured
     
@@ -98,7 +126,8 @@ backtree.TreeView = Backbone.View.extend({
         model: node, 
         parentView: this, 
         branchAttribute: this.branchAttribute,
-        templateRenderer: this.childTemplateRenderer 
+        templateRenderer: this.childTemplateRenderer,
+        eventCoordinator: this.eventCoordinator
     });
 
     // Keep track of childviews & render it
@@ -149,10 +178,17 @@ backtree.NodeView = backtree.TreeView.extend({
    * 
    * */
   tagName: "ul",
-  template: _.template('<li><div class="bt-node"><div class="bt-type-<%= type %>"></div><div class="bt-icon bt-icon-<%= type %>"></div><%= name||id %></div></li>'),
-  //template: _.template('<li><%= name||id %></li>'),
+  template: _.template('<li><div class="bt-node"><div class="bt-arrow <% if (state != undefined && state === "open"){ %>bt-arrow-open<% } %>"></div><div class="bt-icon bt-icon-<%= type %>"></div><%= name||id %></div></li>'),
+  
+  /* Events check for mobile compatibility */
   events: function(){
-    return backtree.isMobile ? { "touchstart": 'select' } : { "click .bt-node": 'select'}
+    return backtree.isMobile ? { 
+      "touchstart .bt-node": 'select',
+      "touchstart .bt-arrow": 'toggleVisibility'
+    } : { 
+      "click .bt-node": 'select',
+      "click .bt-arrow": 'toggleVisibility'
+    }
   },
   constructor: function(options){
     var args = Array.prototype.slice.apply(arguments);
@@ -163,10 +199,11 @@ backtree.NodeView = backtree.TreeView.extend({
   initialize: function(options){
     this.templateRenderer = options.templateRenderer;
     this.collection = this.model[options.branchAttribute];
+    this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator();
   },
   render: function(){
     var html = this.returnRendered();
-    this.$el.addClass('backtreespacer').html(html).attr('data-id', this.model.cid);
+    this.$el.addClass('bt-branch').html(html).attr('data-id', this.model.cid);
     this.renderCollection();
     return this;
   },
@@ -175,6 +212,8 @@ backtree.NodeView = backtree.TreeView.extend({
     backtree.TreeView.prototype.render.apply(this, args);
   },
   returnRendered: function(){
+    if (this.model.get('state') === undefined) { this.model.set({'state':'closed'}); }
+
     var html = '';
     if(this.templateRenderer !== undefined){
       html = this.templateRenderer(this.model, this);
@@ -186,18 +225,27 @@ backtree.NodeView = backtree.TreeView.extend({
   appendHTML: function(collectionView, nodeView){
     collectionView.$("li:first")
         .append(nodeView.el)
-        .find("div.bt-type-collection:first")
-        .addClass("bt-type-collection-open")
+        .find("div.bt-arrow:first")
+        .addClass("bt-arrow-open")
         .end()
         .find("div.bt-icon:first")
         .addClass("bt-icon-collection-open");
   },
   select: function(event){
-    event.preventDefault();
-    event.stopPropagation();
-    this.$('.bt-node:first').toggleClass('bt-node-selected');
+    if (event !== undefined){
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    var selected = this.$('.bt-node:first').toggleClass('bt-node-selected').hasClass('bt-node-selected');
+    this.eventPublish((selected ? 'selected':'unselected'), {view: this}, this.model);
   },
-  openHandler: function(event){
-    
+  toggleVisibility: function(event){
+    if (event !== undefined){
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    var hidden = this.$el.toggleClass('bt-node-closed').hasClass('bt-node-closed');
+    this.eventPublish((hidden ? 'hidden':'visible'), {view: this}, this.model);
+    return true;
   }
 });

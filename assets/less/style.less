@@ -1,12 +1,24 @@
-/* 
-  Base style for BackTree
-*/
+/*  Base style for BackTree */
 
 @backtree-background-color: #eee;
 @backtree-li-hover-background-color: #ddd;
 @backtree-background-textcolor: #333;
 @backtree-border: #ddd;
 
+
+/* Mixins */
+.visuallyhidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px; width:1px;
+  margin: -1px; 
+  padding: 0; 
+  border: 0;
+}
+
+
+/* Actual Styles */
 #backtree {
   border-left: 2px solid @backtree-border;
   border-right: 2px solid @backtree-border;
@@ -19,7 +31,7 @@
         line-height: 22px;
         .bt-node {
           margin-top:1px;
-          .bt-icon, .bt-type-collection {
+          .bt-icon, .bt-arrow {
             width:16px;
             height: 16px;
             font-size: 10px; line-height:10px;
@@ -28,17 +40,17 @@
             padding:0;
             clear:none;
           }
-          .bt-type-collection {
+          .bt-arrow {
             background-position: 0 -61px;
             margin: 0 0 0 4px;
           }
-          .bt-type-collection:active {
+          .bt-arrow:active {
             background-position: -64px -61px;
           }
-          .bt-type-collection-open {
+          .bt-arrow-open {
             background-position: 0 -93px;
           }
-          .bt-type-collection-open:active {
+          .bt-arrow-open:active {
             background-position: -64px -93px;
           }
           .bt-icon {
@@ -46,7 +58,8 @@
               height: 18px;
               background-position: -128px -28px;
           }
-          .bt-icon-collection-open {
+          /* Shows an open icon */
+          .bt-icon-collection-open-icon {
               background-position: -128px 3px;
           }
         }
@@ -74,17 +87,28 @@
           background: -ms-linear-gradient(top, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
           background: linear-gradient(to bottom, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
           filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#edf2f2', endColorstr='#222a3a',GradientType=0 );
-          .bt-type-collection {
+          .bt-arrow {
             background-position: -96px -61px;
           }
-          .bt-type-collection-open {
+          .bt-arrow-open {
             background-position: -96px -93px;
           }
         }
       }
     }
+    ul.bt-node-closed > li > ul {
+      .visuallyhidden;
+    }
+    ul.bt-node-closed {
+      .bt-node {
+          .bt-arrow {
+            background-position: 0 -61px;
+            margin: 0 0 0 4px;
+          }
+      }
+    }
   /* Used for placing over the element */
-  ul ul.backtreespacer {
+  ul ul.bt-branch {
     padding-left: 8px;
   }
 }

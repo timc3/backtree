@@ -9,7 +9,7 @@ jsonstructure = {'id':'Item1', 'name':'Test Item1', 'contents':
           {'id':'SubItem5', 'name':'Sub Item 5', 'type':'item'}
         ]
       },
-      {'id':'collection2', 'type':'collection', 'url': '/Item2/contents/collection2/', 'name':'Collection 2', 'state':'open', 'models':
+      {'id':'collection2', 'type':'collection', 'url': '/Item2/contents/collection2/', 'name':'Collection 2', 'state':'closed', 'models':
         [
           {'id':'SubItem6', 'name':'Sub Item 6', 'type':'item'},
           {'id':'SubItem7', 'name':'Sub Item 7', 'type':'item'},
@@ -27,7 +27,7 @@ jsonstructure = {'id':'Item1', 'name':'Test Item1', 'contents':
           {'id':'SubItem15', 'name':'Sub Item 15', 'type':'item'}
         ], 'contents':
         [
-          {'id':'subcollection1', 'type':'collection', 'url':'/Item1/contents/collections1/contents/subcollection1/', 'name':'A Sub Collection', 'state':'open', 'models':
+          {'id':'subcollection1', 'type':'collection', 'url':'/Item1/contents/collections1/contents/subcollection1/', 'name':'A Sub Collection', 'state':'closed', 'models':
             [
               {'id':'SubItem16', 'name':'Sub Item 16', 'type':'item'},
               {'id':'SubItem17', 'name':'Sub Item 17', 'type':'item'},
