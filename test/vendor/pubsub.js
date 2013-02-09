@@ -16,7 +16,7 @@
             try {      
                 this.apply(d, args || []);      
             } catch(err) {      
-                log(err);      
+                console.log(err);      
             }      
         });      
     };      
@@ -39,6 +39,15 @@
         });      
     };      
          
+    d.unsubscribeall = function(topic){
+      if (topic===undefined){
+        cache = {};
+      } else {
+        delete cache[topic];
+      }
+      return cache;
+    };
+
     // List Subscribers      
     d.subscribers = function(/* String */topic) {      
         l = [];      

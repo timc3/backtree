@@ -16,7 +16,7 @@ _.extend(EventCoordinator.prototype, {
         this.pubfunction = options.publist || $.publish || undefined;
         this.subfunction =  options.subscribe || $.subscribe || undefined;
         this.unsubfunction = options.unsubscribe || $.unsubscribe || undefined;
-        this.topicPrefix = '/backtree/';
+        this.topicPrefix = options.topicPrefix || '/bt/';
     },
     publish: function(event, arguments, model){
       if (model !== undefined){
@@ -30,8 +30,8 @@ _.extend(EventCoordinator.prototype, {
       }
     },
     unsubscribe: function(topic, callback){
-      if (this.subfunction !== undefined){
-        this.unsubfunction(this.topPrefix + topic, callback);
+      if (this.unsubfunction !== undefined){
+        this.unsubfunction(this.topicPrefix + topic, callback);
       }
     }
 });
@@ -56,6 +56,10 @@ backtree.TreeView = Backbone.View.extend({
    *
    * */
   tagName: "div",
+  
+  // Contains a cache of all the topics subscribed to
+  topicCache: {},
+
   constructor: function(){
     _.bindAll(this, "render");
     
@@ -82,13 +86,18 @@ backtree.TreeView = Backbone.View.extend({
     this.branchAttribute = options.branchAttribute || "contents";
     this.collection = options.collection;
     this.childTemplateRenderer = options.childTemplateRenderer || undefined;
+    this.topicPrefix = options.topicPrefix || '/backtree';
 
-    this.$el.empty().addClass(this.className).attr('role', 'navigation');
-    // If we pass in an element then we can render on to it.
+    // Clear out this element then 
+    //this.$el.empty().addClass(this.className).attr('role', 'navigation');
+    this._renderStructure();
+    this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator({topicPrefix: this.topicPrefix});
+
+    // If we pass in an element then we can render on to it and can
+    // manually call for render.
     if (options.el !== undefined){
       this.render();
     };
-    this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator();
   },
 
   events: function() {
@@ -97,9 +106,28 @@ backtree.TreeView = Backbone.View.extend({
   eventPublish: function(event, args, model){
     this.eventCoordinator.publish(event, args, model);
   },
+  eventSubscribe: function(event, callback){
+    this.eventCoordinator.subscribe(event, callback);
+    this.topicCache[event] = callback;
+  },
+  eventUnSubscribe: function(event, callback){
+    delete this.topicCache[event];
+    this.eventCoordinator.unsubscribe(event, callback);
+  },
+  eventClearAll: function(){
+    _.each(this.topicCache, function(subscription, index){
+      this.eventUnSubscribe(subscription.event, subscription.callback);
+    });
+  },
+
+  // create the DOM structure that is needed for the tree.
+  _renderStructure: function(){
+    this.$el.empty().addClass(this.className);
+    this.$headerEl = $('<header>').appendTo(this.$el);
+    this.$treeEl = $('<nav>').appendTo(this.$el);
+    this.$footerEl = $('<footer>').appendTo(this.$el);
+  },
   render: function(){
-    // Give the root element the className we have configured
-    
     // If we have a collection, build up the subitems.
     if (this.collection && this.collection.length > 0) {
       this.buildCollectionView();
@@ -132,7 +160,8 @@ backtree.TreeView = Backbone.View.extend({
         parentView: this, 
         branchAttribute: this.branchAttribute,
         templateRenderer: this.childTemplateRenderer,
-        eventCoordinator: this.eventCoordinator
+        eventCoordinator: this.eventCoordinator,
+        topicPrefix: this.topicPrefix
     });
 
     // Keep track of childviews & render it
@@ -145,7 +174,7 @@ backtree.TreeView = Backbone.View.extend({
 
   /* In separate function so that we can override it */
   appendHTML:function(collectionView, nodeView, index){
-    collectionView.$el.append(nodeView.el);
+    collectionView.$treeEl.append(nodeView.el);
   },
 
   removeNodeView: function(node){ 
@@ -165,6 +194,7 @@ backtree.TreeView = Backbone.View.extend({
 
   // Another good idea inspired by Marionette
   close: function(){
+    this.eventClearAll();
     this.closeChildren();
     this.remove();
   },
@@ -196,6 +226,7 @@ backtree.NodeView = backtree.TreeView.extend({
     }
   },
   constructor: function(options){
+    _.bindAll(this, "render", "selectEventHandler");
     var args = Array.prototype.slice.apply(arguments);
 
     // Apply these args using the prototypes chains arguments
@@ -237,13 +268,29 @@ backtree.NodeView = backtree.TreeView.extend({
         .addClass("bt-icon-collection-open");
   },
   select: function(event){
+    var self=this;
     if (event !== undefined){
       event.preventDefault();
       event.stopPropagation();
     }
     var selected = this.$('.bt-node:first').toggleClass('bt-node-selected').hasClass('bt-node-selected');
     this.eventPublish((selected ? 'selected':'unselected'), {view: this}, this.model);
+
+    if (selected === true){
+      this.eventSubscribe('selected',  this.selectEventHandler);
+    } else {
+      this.eventUnSubscribe('selected', this.selectEventHandler);
+    }
   },
+  unselect: function(event){
+    var selected = this.$('.bt-node:first').removeClass('bt-node-selected');
+  },
+  /* This deals with the callback from listening to a select event */
+  selectEventHandler: function(){
+    this.eventUnSubscribe('selected', this.selectEventHandler);
+    this.unselect();
+  },
+
   toggleVisibility: function(event){
     if (event !== undefined){
       event.preventDefault();

@@ -1,4 +1,32 @@
 /*  Test scripts depend on Jasmine and Jasmine.JQuery */
+
+describe("Bind to existing Element", function(){
+  beforeEach(function() {
+    myCollection = new testCollection(jsonstructure.contents);
+    tree = new Backtree.TreeView({
+        collection: myCollection,
+        className: 'backtree',
+        childTemplateRenderer: function(model, view){
+          return ('<div>' + model.get('id') + '</div>');
+        } 
+    });
+  });
+
+  it("should be defined correctly", function(){
+    expect(tree).toBeDefined();
+    expect(tree.children).toBeDefined();
+  });
+  it("should not be rendered until we call the render function", function(){
+    expect(tree.$el).not.toContainHtml('<div>collection1</div>');
+  });
+  it("should render on to an element that we can create", function(){
+    var newEl = $('<div>');
+    $('#backtree').append(newEl);
+    newEl.append(tree.render().$el);
+    expect(tree.$el).toContainHtml('<div>collection1</div>');
+  });
+});
+
 describe("Custom Template Renderer", function(){
   beforeEach(function() {
     myCollection = new testCollection(jsonstructure.contents);
@@ -11,6 +39,8 @@ describe("Custom Template Renderer", function(){
         } 
     });
   });
+
+
   it("should be defined correctly", function(){
     expect(tree).toBeDefined();
     expect(tree.children).toBeDefined();
@@ -28,10 +58,15 @@ describe("Basic Backtree Usage", function() {
   beforeEach(function() {
     myCollection = new testCollection(jsonstructure.contents);
     tree = new Backtree.TreeView({
-        collection: myCollection,
-        el: '#backtree',
-        className: 'backtree'
+      collection: myCollection,
+      el: '#backtree',
+      className: 'backtree',
+      topicName: '/backtree/'
     });
+  });
+
+  afterEach(function(){
+    $.unsubscribeall();
   });
 
   it("should define a view with children views", function() {
@@ -153,7 +188,8 @@ describe("Basic Backtree Usage", function() {
     it("should send a pubsub event when selecting a branch", function(){
       var x=0;
       var collectionEl = tree.$('div:contains("Collection 3")');
-      tree.eventCoordinator.subscribe('selected', function(args, model){ x +=1 });
+      testFunc = function(){ x +=1};
+      tree.eventCoordinator.subscribe('selected', function(){ x +=1});
       collectionEl.click();
       expect(x).toBe(1);
     });
@@ -167,11 +203,16 @@ describe("Basic Backtree Usage", function() {
       expect(Object.getPrototypeOf(x.view) === backtree.NodeView.prototype).toBe(true);
       expect(Object.getPrototypeOf(y) === testModel.prototype).toBe(true);
     });
+    it("selecting node view should listen to other select events so that we can unselect this", function(){
+        var x={}, y={};
+        var collectionEl1 = tree.$('div:contains("Collection 2")');
+        var collectionEl2 = tree.$('div:contains("Collection 3")');
+        collectionEl1.click();
+        collectionEl2.click();
+        expect(collectionEl1.hasClass('bt-node-selected')).toBe(false);
+    });
   });
 
-  xit("selecting node view should bind a once event handler to make sure that on another node selecting we take off the selection", function(){
-    
-  });
 
   it("should be able to put something a little deeper using the API.", function(){
     tree.collection.models[2].contents.add([new testModel({
