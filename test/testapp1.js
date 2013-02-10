@@ -44,10 +44,14 @@ var testModel = Backbone.Model.extend({
     id: '',
     name: '',
     type: ''
-  }
+  },
+  url: function() {
+    return this.get('url') + '?json';
+   },
+
 });
 
 var testCollection = Backbone.Collection.extend({
-  model: testModel
+  model: testModel,
 });
 

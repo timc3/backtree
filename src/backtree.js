@@ -77,8 +77,8 @@ backtree.FooterView = backtree.View.extend({
     backtree.View.prototype.constructor.apply(this, args);
   },
   events: {
-    "unselected": "disable",
-    "selected": "enable"
+    "click .bt-ft-add-button": "addCollection",
+    "click .bt-menu-active .bt-ft-remove-button": "removeCollection",
   },
   initialize: function(options){
     this.selectedCollection = options.selectedCollection || [];  // Probably should decouple this and make it optional
@@ -97,8 +97,15 @@ backtree.FooterView = backtree.View.extend({
   // Disable menu items that need selected tree.
   disable: function(){
     this.$('.menu').removeClass('bt-menu-active');
-  }
+  },
 
+  addCollection: function(){
+    console.log('add new collection');
+  },
+
+  removeCollection: function(){
+    this.selectedCollection[0].collection.destroy();
+  }
 });
 
 backtree.TreeView = backtree.View.extend({
@@ -237,6 +244,10 @@ backtree.TreeView = backtree.View.extend({
 
   removeNodeView: function(node){ 
     view = this.children.findByModel(node);
+    if (this.selectedCollection[0].collection.cid === node.cid){
+      this.selectedCollection.pop(0);
+      this.footer.disable();
+    }
     this.removeChildView(view);
   },
 
