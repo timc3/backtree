@@ -147,9 +147,62 @@
     background: linear-gradient(to bottom,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dddddd',GradientType=0 );
 
+    .right {
+      float: right;
+    }
+    ul.menu {
+      display:inline-block;
+      list-style-type:none;
+      line-height: 24px;
+      border-left: 1px solid #eee;
+      li {
+        height: 24px;
+        line-height: 24px;
+        float:left;
+          border-right: 1px solid #eee;
+          border-left: 1px solid #bbb;
+        a {
+          display:inline-block;
+          text-indent: -9999px;
+          text-align: left;
+          width: 24px;
+          padding: 0 4px;
+          background: url(../img/backtree_sprite.png) no-repeat left top;
+        }
+        a.bt-ft-add-button {
+          background-position: -24px -124px;
+        }
+        a.bt-ft-add-button:hover {
+          background-position: -88px -124px;
+        }
+        a.bt-ft-add-button:active {
+          background-position: -120px -123px;
+        }
+        a.bt-ft-remove-button {
+          background-position: 8px -156px;
+        }
+      }
+      li:last-of-type {
+        border-right: 0;
+      }
+    }
+    ul.bt-menu-active {
+      li {
+        a.bt-ft-remove-button:hover {
+          background-position: -56px -156px;
+        }
+        a.bt-ft-remove-button:active {
+          background-position: -120px -155px;
+        }
+        a.bt-ft-remove-button {
+          background-position: -24px -156px;
+        }
+      }
+    }
+
 
   }
-  nav {
+  nav.tree {
     overflow:auto;
     width: 100%;
   }

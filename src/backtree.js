@@ -35,8 +35,73 @@ _.extend(EventCoordinator.prototype, {
       }
     }
 });
+backtree.View = Backbone.View.extend({
 
-backtree.TreeView = Backbone.View.extend({
+  // Contains a cache of all the topics subscribed to
+  topicCache: {},
+  eventCoordinator: '',
+  constructor: function(){
+    var args = Array.prototype.slice.apply(arguments);
+    Backbone.View.prototype.constructor.apply(this, args);
+  },
+  eventPublish: function(event, args, model){
+    this.eventCoordinator.publish(event, args, model);
+  },
+  eventSubscribe: function(event, callback){
+    this.eventCoordinator.subscribe(event, callback);
+    this.topicCache[event] = callback;
+  },
+  eventUnSubscribe: function(event, callback){
+    delete this.topicCache[event];
+    this.eventCoordinator.unsubscribe(event, callback);
+  },
+  eventClearAll: function(){
+    var self = this;
+    _.each(this.topicCache, function(subscription, index){
+      self.eventUnSubscribe(subscription.event, subscription.callback);
+    });
+  }
+});
+backtree.FooterView = backtree.View.extend({
+  tagName: "footer",
+  template: _.template('\
+    <nav class="right">\
+    <ul class="menu">\
+    <li><a href="#" class="bt-ft-add-button">Add</a></li>\
+    <li><a href="#" class="bt-ft-remove-button">Remove</a></li></ul>\
+    </nav>\
+    '),
+  constructor: function(){
+    _.bindAll(this, "render", "enable", "disable");
+    var args = Array.prototype.slice.apply(arguments);
+    backtree.View.prototype.constructor.apply(this, args);
+  },
+  events: {
+    "unselected": "disable",
+    "selected": "enable"
+  },
+  initialize: function(options){
+    this.selectedCollection = options.selectedCollection || [];  // Probably should decouple this and make it optional
+  },
+
+  render: function(){
+    this.$el.html(this.template());
+    return this;
+  },
+
+  // Enable menu views that need selected tree.
+  enable: function(){
+    this.$('.menu').addClass('bt-menu-active');
+  },
+
+  // Disable menu items that need selected tree.
+  disable: function(){
+    this.$('.menu').removeClass('bt-menu-active');
+  }
+
+});
+
+backtree.TreeView = backtree.View.extend({
   /*  Main Tree View 
    *  Represents a tree.
    *  
@@ -56,9 +121,7 @@ backtree.TreeView = Backbone.View.extend({
    *
    * */
   tagName: "div",
-  
-  // Contains a cache of all the topics subscribed to
-  topicCache: {},
+  selectedCollection: [],
 
   constructor: function(){
     _.bindAll(this, "render");
@@ -66,7 +129,7 @@ backtree.TreeView = Backbone.View.extend({
     // We create a structure for the child.
     this.children = new Backbone.ChildViewContainer();
     var args = Array.prototype.slice.apply(arguments);
-    Backbone.View.prototype.constructor.apply(this, args);
+    backtree.View.prototype.constructor.apply(this, args);
   
     // Bind the initial events ala Marionette.
     this._initialEvents();
@@ -81,7 +144,7 @@ backtree.TreeView = Backbone.View.extend({
   },
 
   initialize: function(options) {
-
+    this.selectedCollection = [];
     this.className = options.className || "backtree";
     this.stateAttribute = options.stateAttribute || "state";
     this.branchAttribute = options.branchAttribute || "contents";
@@ -89,13 +152,9 @@ backtree.TreeView = Backbone.View.extend({
     this.childTemplateRenderer = options.childTemplateRenderer || undefined;
     this.topicPrefix = options.topicPrefix || '/backtree/';
 
-    // Clear out this element then 
-    //this.$el.empty().addClass(this.className).attr('role', 'navigation');
-    this._renderStructure();
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator({topicPrefix: this.topicPrefix});
+    this._renderStructure();
 
-    /* Stores the selected collection */
-    this.selectedCollection = [];
     this._selectedEventBinder();
 
     // If we pass in an element then we can render on to it and can
@@ -110,27 +169,11 @@ backtree.TreeView = Backbone.View.extend({
     var self=this;
     this.eventSubscribe('unselected', function(obj, collection){
       self.selectedCollection = _.reject(self.selectedCollection, function(viewObj){ if(viewObj.view.cid == obj.view.cid){ return viewObj;}});
+      if (self.selectedCollection.length === 0){  self.footer.disable(); }
     });
     this.eventSubscribe('selected', function(obj, collection){
       self.selectedCollection.push({view: obj.view, collection: collection});
-    });
-  },
-
-  eventPublish: function(event, args, model){
-    this.eventCoordinator.publish(event, args, model);
-  },
-  eventSubscribe: function(event, callback){
-    this.eventCoordinator.subscribe(event, callback);
-    this.topicCache[event] = callback;
-  },
-  eventUnSubscribe: function(event, callback){
-    delete this.topicCache[event];
-    this.eventCoordinator.unsubscribe(event, callback);
-  },
-  eventClearAll: function(){
-    var self = this;
-    _.each(this.topicCache, function(subscription, index){
-      self.eventUnSubscribe(subscription.event, subscription.callback);
+      if (self.selectedCollection.length > 0){  self.footer.enable(); }
     });
   },
 
@@ -138,8 +181,10 @@ backtree.TreeView = Backbone.View.extend({
   _renderStructure: function(){
     this.$el.empty().addClass(this.className);
     this.$headerEl = $('<header>').appendTo(this.$el);
-    this.$treeEl = $('<nav>').appendTo(this.$el);
-    this.$footerEl = $('<footer>').appendTo(this.$el);
+    this.$treeEl = $('<nav class="tree">').appendTo(this.$el);
+    this.footer = new backtree.FooterView({eventCoordinator: this.eventCoordinator, selectedCollection: this.selectedCollection});
+    this.footer.render();
+    this.footer.$el.appendTo(this.$el);
   },
 
   render: function(){
