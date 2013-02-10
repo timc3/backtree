@@ -150,6 +150,38 @@ describe("Basic Backtree Usage", function() {
     expect(tree.$('div:contains("A Sub Collection")').find('.bt-icon-collection').length).toBe(1);
   });
 
+  describe("Footer", function(){
+    it("should have the remove button disabled by default until click on a sub item", function(){
+      var _footermenu = tree.$('footer nav ul.menu');
+      var spy = spyOn(tree.footer, 'removeCollection').andCallThrough();
+      expect(_footermenu.hasClass('bt-menu-active')).not.toBe(true);
+      _footermenu.find('a.bt-ft-remove-button').click();
+      expect(spy).not.toHaveBeenCalled();
+    });
+    it("after selecting an item it should allow us to remove a collection", function(){
+      var collectionEl = tree.$('div:contains("Collection 2")');
+      var _footermenu = tree.$('footer nav ul.menu');
+      var spy = spyOn(tree.footer, 'removeCollection').andCallThrough();
+      collectionEl.click();
+      tree.footer.delegateEvents();
+      expect(_footermenu.hasClass('bt-menu-active')).toBe(true);
+      _footermenu.find('a.bt-ft-remove-button').click();
+      expect(spy).toHaveBeenCalled();
+    });
+    it("after removing a collection selected should be zero and it should be disabled again.", function(){
+      var collectionEl = tree.$('div:contains("Collection 2")');
+      var _footermenu = tree.$('footer nav ul.menu');
+      var spy = spyOn(tree.footer, 'removeCollection').andCallThrough();
+      collectionEl.click();
+      tree.footer.delegateEvents();
+      expect(_footermenu.hasClass('bt-menu-active')).toBe(true);
+      _footermenu.find('a.bt-ft-remove-button').click();
+      expect(spy).toHaveBeenCalled();
+      expect(tree.selectedCollection.length).toBe(0);
+      expect(_footermenu.hasClass('bt-menu-active')).not.toBe(true);
+    });
+  });
+
   describe("click to expand on branch", function(){
     it("should toggle visibility of a branch with child nodes by setting the correct class", function(){
       var collectionEl = tree.$('div:contains("Collection 3")');

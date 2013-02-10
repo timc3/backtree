@@ -104,7 +104,7 @@ backtree.FooterView = backtree.View.extend({
   },
 
   removeCollection: function(){
-    this.selectedCollection[0].collection.destroy();
+    this.$el.trigger('remove-selected-collection');
   }
 });
 
@@ -149,7 +149,6 @@ backtree.TreeView = backtree.View.extend({
       this.listenTo(this.collection, "reset", this.render, this);
     }
   },
-
   initialize: function(options) {
     this.selectedCollection = [];
     this.className = options.className || "backtree";
@@ -158,7 +157,6 @@ backtree.TreeView = backtree.View.extend({
     this.collection = options.collection;
     this.childTemplateRenderer = options.childTemplateRenderer || undefined;
     this.topicPrefix = options.topicPrefix || '/backtree/';
-
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator({topicPrefix: this.topicPrefix});
     this._renderStructure();
 
@@ -193,7 +191,7 @@ backtree.TreeView = backtree.View.extend({
     this.footer.render();
     this.footer.$el.appendTo(this.$el);
   },
-
+  events: {'remove-selected-collection': 'removeSelected'},
   render: function(){
     if (this.collection && this.collection.length > 0) {
       this.buildCollectionView();
@@ -244,11 +242,17 @@ backtree.TreeView = backtree.View.extend({
 
   removeNodeView: function(node){ 
     view = this.children.findByModel(node);
-    if (this.selectedCollection[0].collection.cid === node.cid){
+    if (this.selectedCollection[0] !== undefined && this.selectedCollection[0].collection.cid === node.cid){
       this.selectedCollection.pop(0);
       this.footer.disable();
     }
     this.removeChildView(view);
+  },
+
+  removeSelected: function(){
+    if (this.selectedCollection[0] !== undefined && this.selectedCollection[0].hasOwnProperty('collection')){
+      this.selectedCollection[0].collection.destroy();
+    }
   },
 
   /* Remove a single child view */
