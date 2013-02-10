@@ -81,17 +81,22 @@ backtree.TreeView = Backbone.View.extend({
   },
 
   initialize: function(options) {
+
     this.className = options.className || "backtree";
     this.stateAttribute = options.stateAttribute || "state";
     this.branchAttribute = options.branchAttribute || "contents";
     this.collection = options.collection;
     this.childTemplateRenderer = options.childTemplateRenderer || undefined;
-    this.topicPrefix = options.topicPrefix || '/backtree';
+    this.topicPrefix = options.topicPrefix || '/backtree/';
 
     // Clear out this element then 
     //this.$el.empty().addClass(this.className).attr('role', 'navigation');
     this._renderStructure();
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator({topicPrefix: this.topicPrefix});
+
+    /* Stores the selected collection */
+    this.selectedCollection = [];
+    this._selectedEventBinder();
 
     // If we pass in an element then we can render on to it and can
     // manually call for render.
@@ -100,7 +105,15 @@ backtree.TreeView = Backbone.View.extend({
     };
   },
 
-  events: function() {
+  // Selected and Unselected Views need to be added and removed from the selectedCollection
+  _selectedEventBinder: function(){
+    var self=this;
+    this.eventSubscribe('unselected', function(obj, collection){
+      self.selectedCollection = _.reject(self.selectedCollection, function(viewObj){ if(viewObj.view.cid == obj.view.cid){ return viewObj;}});
+    });
+    this.eventSubscribe('selected', function(obj, collection){
+      self.selectedCollection.push({view: obj.view, collection: collection});
+    });
   },
 
   eventPublish: function(event, args, model){
@@ -115,8 +128,9 @@ backtree.TreeView = Backbone.View.extend({
     this.eventCoordinator.unsubscribe(event, callback);
   },
   eventClearAll: function(){
+    var self = this;
     _.each(this.topicCache, function(subscription, index){
-      this.eventUnSubscribe(subscription.event, subscription.callback);
+      self.eventUnSubscribe(subscription.event, subscription.callback);
     });
   },
 
@@ -127,15 +141,14 @@ backtree.TreeView = Backbone.View.extend({
     this.$treeEl = $('<nav>').appendTo(this.$el);
     this.$footerEl = $('<footer>').appendTo(this.$el);
   },
+
   render: function(){
-    // If we have a collection, build up the subitems.
     if (this.collection && this.collection.length > 0) {
       this.buildCollectionView();
     } 
     this.trigger("rendered");
     return this;
   },
-
 
   /* Build up a view of the nodes in the collection. */
   buildCollectionView: function(){
@@ -213,7 +226,10 @@ backtree.NodeView = backtree.TreeView.extend({
    * 
    * */
   tagName: "ul",
-  template: _.template('<li><div class="bt-node"><div class="bt-arrow <% if (state != undefined && state === "open"){ %>bt-arrow-open<% } %>"></div><div class="bt-icon bt-icon-<%= type %>"></div><%= name||id %></div></li>'),
+  template: _.template('<li><div class="bt-node">\
+      <div class="bt-arrow <% if (state != undefined && state === "open"){ %>bt-arrow-open<% } %>">\
+      </div><div class="bt-icon bt-icon-<%= type %>">\
+      </div><span class="contenteditable"><%= name||id %></span></div></li>'),
   
   /* Events check for mobile compatibility */
   events: function(){
@@ -222,7 +238,8 @@ backtree.NodeView = backtree.TreeView.extend({
       "touchstart .bt-arrow": 'toggleVisibility'
     } : { 
       "click .bt-node": 'select',
-      "click .bt-arrow": 'toggleVisibility'
+      "click .bt-arrow": 'toggleVisibility',
+      "click .contenteditable": 'editname'
     }
   },
   constructor: function(options){
@@ -284,13 +301,37 @@ backtree.NodeView = backtree.TreeView.extend({
   },
   unselect: function(event){
     var selected = this.$('.bt-node:first').removeClass('bt-node-selected');
+    this.eventPublish('unselected', {view: this}, this.model);
   },
   /* This deals with the callback from listening to a select event */
   selectEventHandler: function(){
     this.eventUnSubscribe('selected', this.selectEventHandler);
     this.unselect();
   },
-
+  editname: function(event){
+    var span = event.target || event.srcElement, self = this, 
+        text = span.innerHTML,
+        input = document.createElement("input");
+      span.style.display = "none";
+      input.type = "text"; input.value = text;
+      span.parentNode.insertBefore(input, span);
+      input.focus();
+      $(input).keydown(function(event){
+        if (event.which == 27){ // escaping out
+          input.onblur = null;
+          span.parentNode.removeChild(input);
+          span.style.display = "";
+        } else if (event.which ==13) {
+          input.blur();
+        }
+      });
+      input.onblur = function(){
+         span.innerHTML = input.value;
+         self.model.set({name: input.value}); 
+         span.parentNode.removeChild(input);
+         span.style.display = "";
+      }
+  },
   toggleVisibility: function(event){
     if (event !== undefined){
       event.preventDefault();

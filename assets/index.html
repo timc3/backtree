@@ -23,7 +23,7 @@
                     
                     </div>
                 </div>
-                <aside id="backgrid"> 
+                <aside id="backtree"> 
                Test 
                 </aside>
             </section>
@@ -36,14 +36,18 @@
     <script type="text/javascript" charset="utf-8" src="../lib/lodash.underscore.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="../lib/backbone-min.js"></script>
     <script type="text/javascript" charset="utf-8" src="../lib/backbone.babysitter.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../test/vendor/pubsub.js"></script>
     <script type="text/javascript" charset="utf-8" src="../src/backtree.js"></script>
     <script type="text/javascript" charset="utf-8" src="../test/json/test1.jsonp"></script>
     <script type="text/javascript" charset="utf-8" src="../test/testapp1.js"></script>
     <script type="text/javascript" charset="utf-8">
         $(function () {
-            myModel = new testModel(jsonstructure.model);
-            testTree = new Backtree.Tree({
-                rootCollection: myModel.get('contents')
+            myCollection = new testCollection(jsonstructure.contents);
+            tree = new Backtree.TreeView({
+              collection: myCollection,
+              el: '#backtree',
+              className: 'backtree',
+              topicName: '/backtree/'
             });
         });
     </script>

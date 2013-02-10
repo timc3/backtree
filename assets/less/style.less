@@ -4,7 +4,8 @@
 @backtree-li-hover-background-color: #ddd;
 @backtree-background-textcolor: #333;
 @backtree-border: #ddd;
-
+@backtree-footer-background-color: #ddd;
+@backtree-footer-border-color: #d3d3d3;
 
 /* Mixins */
 .visuallyhidden {
@@ -62,9 +63,22 @@
           .bt-icon-collection-open-icon {
               background-position: -128px 3px;
           }
+          input {
+            background:transparent;
+            color: inherit;
+            border: 0;
+            font-size:inherit;
+            margin: 0;
+            padding: 0;
+            outline: none;
+            width: 50%;
+          }
         }
         .bt-node:hover {
            background-color: @backtree-li-hover-background-color;
+        }
+        .bt-node:first-of-type {
+          margin-top:0;
         }
         .bt-node-selected:active {
           background: #b6caca;
@@ -111,6 +125,35 @@
   ul ul.bt-branch {
     padding-left: 8px;
   }
+
+  header {
+    height: 0;
+    border: 0;
+  }
+  footer {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    height: 24px;
+    background-color: @backtree-footer-background-color;
+    border: 1px solid @backtree-footer-border-color; 
+    border-width: 1px 0;
+    background: #ffffff;
+    background: -moz-linear-gradient(top,  #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(3%,#e4e4e4), color-stop(100%,#dddddd));
+    background: -webkit-linear-gradient(top,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
+    background: -o-linear-gradient(top,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
+    background: -ms-linear-gradient(top,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
+    background: linear-gradient(to bottom,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dddddd',GradientType=0 );
+
+
+  }
+  nav {
+    overflow:auto;
+    width: 100%;
+  }
+
 }
 
 

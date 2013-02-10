@@ -213,6 +213,66 @@ describe("Basic Backtree Usage", function() {
     });
   });
 
+  describe("Selecting and UnSelecting", function(){
+    it("should have an array to store an object of the view and collection", function(){
+      expect(tree.selectedCollection).toBeDefined();
+      expect(tree.selectedCollection instanceof Array).toBe(true);
+    });
+    it("should store the selected views and collections", function(){
+        var collectionEl1 = tree.$('div:contains("Collection 2")');
+        collectionEl1.click();
+        expect(tree.selectedCollection.length).toBe(1);
+    });
+    it("should store one selected view at a time for this application", function(){
+        var collectionEl1 = tree.$('div:contains("Collection 2")');
+        var collectionEl2 = tree.$('div:contains("Collection 3")');
+        collectionEl1.click();
+        collectionEl2.click();
+        expect(tree.selectedCollection.length).toBe(1);
+    });
+    it("we store a reference to the view and the collection", function(){
+        var collectionEl1 = tree.$('div:contains("Collection 2")');
+        collectionEl1.click();
+        expect(tree.selectedCollection[0].hasOwnProperty('view')).toBe(true);
+        expect(tree.selectedCollection[0].hasOwnProperty('collection')).toBe(true);
+    });
+  });
+
+  describe("Should be able to edit the text of a collection", function(){
+    it("clicking on the text should convert to an input field", function(){
+      var collectionEl1 = tree.$('div:contains("Collection 2")');
+      collectionEl1.find('.contenteditable').click();
+      expect(collectionEl1).toContainHtml('<input type="text">');
+    });
+    it("Hitting Escape should cancel the editing", function(){
+      var collectionEl1 = tree.$('div:contains("Collection 2")');
+      var press = jQuery.Event('keydown'); press.ctrlKey = false; press.which = 27; 
+      collectionEl1.find('.contenteditable').click();
+      collectionEl1.find('input').trigger(press);
+      expect(collectionEl1).not.toContainHtml('<input type="text">');
+    });
+    it("Hitting return should accept the editing", function(){
+      var collectionEl1 = tree.$('div:contains("Collection 2")');
+      var press = jQuery.Event('keydown'); press.ctrlKey = false; press.which = 13; 
+      collectionEl1.find('.contenteditable').click();
+      var input = collectionEl1.find('input')
+      input.val('ITWorks');
+      input.trigger(press);
+      expect(collectionEl1).not.toContainHtml('Collection 2');
+      expect(collectionEl1).toContainHtml('ITWorks');
+    });
+    it("On blur or clicking somewhere else should accept the editing", function(){
+      var collectionEl1 = tree.$('div:contains("Collection 1")');
+      var collectionEl2 = tree.$('div:contains("Collection 3")');
+      var press = jQuery.Event('keydown'); press.ctrlKey = false; press.which = 13; 
+      collectionEl1.find('.contenteditable').click();
+      var input = collectionEl1.find('input')
+      input.val('ITWorks');
+      collectionEl2.find('.contenteditable').click();
+      expect(collectionEl1).not.toContainHtml('Collection 1');
+      expect(collectionEl1).toContainHtml('ITWorks');
+    });
+  });
 
   it("should be able to put something a little deeper using the API.", function(){
     tree.collection.models[2].contents.add([new testModel({

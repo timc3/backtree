@@ -62,8 +62,21 @@
 #backtree ul li .bt-node .bt-icon-collection-open-icon {
   background-position: -128px 3px;
 }
+#backtree ul li .bt-node input {
+  background: transparent;
+  color: inherit;
+  border: 0;
+  font-size: inherit;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  width: 50%;
+}
 #backtree ul li .bt-node:hover {
   background-color: #dddddd;
+}
+#backtree ul li .bt-node:first-of-type {
+  margin-top: 0;
 }
 #backtree ul li .bt-node-selected:active {
   background: #b6caca;
@@ -108,4 +121,29 @@
 }
 #backtree ul ul.bt-branch {
   padding-left: 8px;
+}
+#backtree header {
+  height: 0;
+  border: 0;
+}
+#backtree footer {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  height: 24px;
+  background-color: #dddddd;
+  border: 1px solid #d3d3d3;
+  border-width: 1px 0;
+  background: #ffffff;
+  background: -moz-linear-gradient(top, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(3%, #e4e4e4), color-stop(100%, #dddddd));
+  background: -webkit-linear-gradient(top, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  background: -o-linear-gradient(top, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  background: -ms-linear-gradient(top, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  background: linear-gradient(to bottom, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#dddddd', GradientType=0);
+}
+#backtree nav {
+  overflow: auto;
+  width: 100%;
 }
