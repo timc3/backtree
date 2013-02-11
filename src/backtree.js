@@ -35,8 +35,11 @@ _.extend(EventCoordinator.prototype, {
       }
     }
 });
-backtree.View = Backbone.View.extend({
 
+/* Backtree View
+ *
+ */
+backtree.View = Backbone.View.extend({
   // Contains a cache of all the topics subscribed to
   topicCache: {},
   eventCoordinator: '',
@@ -62,6 +65,10 @@ backtree.View = Backbone.View.extend({
     });
   }
 });
+
+/* FooterView. 
+ * Override this for custom footers.
+ */
 backtree.FooterView = backtree.View.extend({
   tagName: "footer",
   template: _.template('\
@@ -71,17 +78,21 @@ backtree.FooterView = backtree.View.extend({
     <li><a href="#" class="bt-ft-remove-button">Remove</a></li></ul>\
     </nav>\
     '),
+
   constructor: function(){
     _.bindAll(this, "render", "enable", "disable");
     var args = Array.prototype.slice.apply(arguments);
     backtree.View.prototype.constructor.apply(this, args);
   },
-  events: {
-    "click .bt-ft-add-button": "addCollection",
-    "click .bt-menu-active .bt-ft-remove-button": "removeCollection",
-  },
-  initialize: function(options){
-    this.selectedCollection = options.selectedCollection || [];  // Probably should decouple this and make it optional
+
+  events: function(){
+    return backtree.isMobile ? { 
+      "touchstart .bt-ft-add-button": 'addCollection',
+      "touchstart .bt-menu-active .bt-ft-remove-button": 'removeCollection'
+    } : { 
+      "click .bt-ft-add-button": "addCollection",
+      "click .bt-menu-active .bt-ft-remove-button": "removeCollection",
+    }
   },
 
   render: function(){
@@ -99,10 +110,12 @@ backtree.FooterView = backtree.View.extend({
     this.$('.menu').removeClass('bt-menu-active');
   },
 
+  // Respond to add button
   addCollection: function(){
     console.log('add new collection');
   },
 
+  // Response to remove button
   removeCollection: function(){
     this.$el.trigger('remove-selected-collection');
   }
@@ -149,6 +162,9 @@ backtree.TreeView = backtree.View.extend({
       this.listenTo(this.collection, "reset", this.render, this);
     }
   },
+
+  events: {'remove-selected-collection': 'removeSelected'},
+
   initialize: function(options) {
     this.selectedCollection = [];
     this.className = options.className || "backtree";
@@ -159,7 +175,6 @@ backtree.TreeView = backtree.View.extend({
     this.topicPrefix = options.topicPrefix || '/backtree/';
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator({topicPrefix: this.topicPrefix});
     this._renderStructure();
-
     this._selectedEventBinder();
 
     // If we pass in an element then we can render on to it and can
@@ -187,11 +202,11 @@ backtree.TreeView = backtree.View.extend({
     this.$el.empty().addClass(this.className);
     this.$headerEl = $('<header>').appendTo(this.$el);
     this.$treeEl = $('<nav class="tree">').appendTo(this.$el);
-    this.footer = new backtree.FooterView({eventCoordinator: this.eventCoordinator, selectedCollection: this.selectedCollection});
+    this.footer = new backtree.FooterView();
     this.footer.render();
     this.footer.$el.appendTo(this.$el);
   },
-  events: {'remove-selected-collection': 'removeSelected'},
+
   render: function(){
     if (this.collection && this.collection.length > 0) {
       this.buildCollectionView();
@@ -282,7 +297,7 @@ backtree.TreeView = backtree.View.extend({
 });
 
 backtree.NodeView = backtree.TreeView.extend({
-  /* Collection Node View
+  /* Collection Node View. Used for rendering the branches as Child Views to the main structure
    * 
    * */
   tagName: "ul",
@@ -302,6 +317,7 @@ backtree.NodeView = backtree.TreeView.extend({
       "click .contenteditable": 'editname'
     }
   },
+
   constructor: function(options){
     _.bindAll(this, "render", "selectEventHandler");
     var args = Array.prototype.slice.apply(arguments);
@@ -309,21 +325,25 @@ backtree.NodeView = backtree.TreeView.extend({
     // Apply these args using the prototypes chains arguments
     backtree.TreeView.apply(this, args);
   },
+
   initialize: function(options){
     this.templateRenderer = options.templateRenderer;
     this.collection = this.model[options.branchAttribute];
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator();
   },
+
   render: function(){
     var html = this.returnRendered();
     this.$el.addClass('bt-branch').html(html).attr('data-id', this.model.cid);
     this.renderCollection();
     return this;
   },
+
   renderCollection: function(){
     var args = Array.prototype.slice.apply(arguments);
     backtree.TreeView.prototype.render.apply(this, args);
   },
+
   returnRendered: function(){
     if (this.model.get('state') === undefined) { this.model.set({'state':'closed'}); }
 
@@ -335,6 +355,7 @@ backtree.NodeView = backtree.TreeView.extend({
     }
     return html;
   },
+
   appendHTML: function(collectionView, nodeView){
     collectionView.$("li:first")
         .append(nodeView.el)
@@ -344,6 +365,8 @@ backtree.NodeView = backtree.TreeView.extend({
         .find("div.bt-icon:first")
         .addClass("bt-icon-collection-open");
   },
+
+  /* Handler for selecting this collection */
   select: function(event){
     var self=this;
     if (event !== undefined){
@@ -359,15 +382,20 @@ backtree.NodeView = backtree.TreeView.extend({
       this.eventUnSubscribe('selected', this.selectEventHandler);
     }
   },
+
+  /* Hander for unselecting this collection */
   unselect: function(event){
     var selected = this.$('.bt-node:first').removeClass('bt-node-selected');
     this.eventPublish('unselected', {view: this}, this.model);
   },
+
   /* This deals with the callback from listening to a select event */
   selectEventHandler: function(){
     this.eventUnSubscribe('selected', this.selectEventHandler);
     this.unselect();
   },
+  
+  /* Handler for editing the name field of a collection from the DOM */
   editname: function(event){
     var span = event.target || event.srcElement, self = this, 
         text = span.innerHTML,
@@ -392,6 +420,8 @@ backtree.NodeView = backtree.TreeView.extend({
          span.style.display = "";
       }
   },
+
+  /* Handler for toggling the visibility of a node */
   toggleVisibility: function(event){
     if (event !== undefined){
       event.preventDefault();
