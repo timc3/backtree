@@ -174,6 +174,7 @@ backtree.TreeView = backtree.View.extend({
     this.className = options.className || "backtree";
     this.stateAttribute = options.stateAttribute || "state";
     this.branchAttribute = options.branchAttribute || "contents";
+    this.nameAttribute = options.nameAttribute || "name";
     this.collection = options.collection;
     this.childTemplateRenderer = options.childTemplateRenderer || undefined;
     this.topicPrefix = options.topicPrefix || '/backtree/';
@@ -294,6 +295,7 @@ backtree.TreeView = backtree.View.extend({
         model: node, 
         parentView: this, 
         branchAttribute: this.branchAttribute,
+        nameAttribute: this.nameAttribute,
         templateRenderer: this.childTemplateRenderer,
         eventCoordinator: this.eventCoordinator,
         topicPrefix: this.topicPrefix
@@ -362,7 +364,7 @@ backtree.NodeView = backtree.TreeView.extend({
   template: _.template('<li><div class="bt-node">\
       <div class="bt-arrow <% if (state != undefined && state === "open"){ %>bt-arrow-open<% } %>">\
       </div><div class="bt-icon bt-icon-<%= type %>">\
-      </div><span class="contenteditable"><%= name||id %></span></div></li>'),
+      </div><span class="contenteditable"><%= this.model.get(this.nameAttribute) %></span></div></li>'),
   
   /* Events check for mobile compatibility */
   events: function(){
@@ -387,6 +389,7 @@ backtree.NodeView = backtree.TreeView.extend({
   initialize: function(options){
     this.templateRenderer = options.templateRenderer;
     this.collection = this.model[options.branchAttribute];
+    this.nameAttribute = options.nameAttribute;
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator();
     this.listenTo(this.model, 'select', function(){ this.select()}, this);  // Bind to select event (model is actually the wrapper for the collection).
   },

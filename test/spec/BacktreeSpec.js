@@ -25,7 +25,7 @@ describe("Custom Footer View and Header View", function(){
   it("should have the footer defined correctly", function(){
     expect(tree.$('div.testFooterClass').length).toBe(1);
   });
-
+  
   it("should have the header defined correctly", function(){
     expect(tree.$('div.testHeaderClass').length).toBe(1);
   });
@@ -216,7 +216,7 @@ describe("Basic Backtree Usage", function() {
   });
 
   it("should create a node with collection icon if that is the type", function(){
-    expect(tree.$('div:contains("A Sub Collection")').find('.bt-icon-collection').length).toBe(1);
+    expect(tree.$('div.bt-wrapper').find('div:contains("A Sub Collection")').find('.bt-icon-collection').length).toBe(1);
   });
 
   describe("Footer", function(){
@@ -253,7 +253,7 @@ describe("Basic Backtree Usage", function() {
 
   describe("click to expand on branch", function(){
     it("should toggle visibility of a branch with child nodes by setting the correct class", function(){
-      var collectionEl = tree.$('div:contains("Collection 3")');
+      var collectionEl = tree.$('div.bt-wrapper').find('div:contains("Collection 3")');
       collectionEl.find('.bt-arrow').click();
       expect(collectionEl.parents('.bt-node-closed').length).toBe(1);
     });
@@ -261,7 +261,7 @@ describe("Basic Backtree Usage", function() {
     it("toggling function should be called.", function(){
       var collectionView = _.find(tree.children._views, function(view){ if (view.model.get('name') === 'Collection 3'){return view;}});
       var spy = spyOn(collectionView, 'toggleVisibility').andCallThrough();
-      var collectionEl = tree.$('div:contains("Collection 3")');
+      var collectionEl = tree.$('div.bt-wrapper').find('div:contains("Collection 3")');
       collectionView.delegateEvents();
       expect(collectionView).toBeDefined();
       expect(collectionEl.length).toBe(1);
@@ -361,7 +361,7 @@ describe("Basic Backtree Usage", function() {
       expect(collectionEl1).not.toContainHtml('<input type="text">');
     });
     it("Hitting return should accept the editing", function(){
-      var collectionEl1 = tree.$('div:contains("Collection 2")');
+      var collectionEl1 = tree.$('div.bt-wrapper').find('div:contains("Collection 2")');
       var press = jQuery.Event('keydown'); press.ctrlKey = false; press.which = 13; 
       collectionEl1.find('.contenteditable').click();
       var input = collectionEl1.find('input')
@@ -371,8 +371,8 @@ describe("Basic Backtree Usage", function() {
       expect(collectionEl1).toContainHtml('ITWorks');
     });
     it("On blur or clicking somewhere else should accept the editing", function(){
-      var collectionEl1 = tree.$('div:contains("Collection 1")');
-      var collectionEl2 = tree.$('div:contains("Collection 3")');
+      var collectionEl1 = tree.$('div.bt-wrapper').find('div:contains("Collection 1")');
+      var collectionEl2 = tree.$('div.bt-wrapper').find('div:contains("Collection 3")');
       var press = jQuery.Event('keydown'); press.ctrlKey = false; press.which = 13; 
       collectionEl1.find('.contenteditable').click();
       var input = collectionEl1.find('input')
