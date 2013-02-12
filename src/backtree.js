@@ -1,7 +1,7 @@
 var root = window;
 
 backtree = root.Backtree = {
-  VERSION: "0.0.1",
+  VERSION: "0.0.2",
 
   // check if we are using a mobile
   isMobile: (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent))
@@ -179,7 +179,7 @@ backtree.TreeView = backtree.View.extend({
     this.topicPrefix = options.topicPrefix || '/backtree/';
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator({topicPrefix: this.topicPrefix});
     this.footer = options.footer || new backtree.FooterView();
-    this.tree = options.tree || $('<nav class="tree">');
+    this.tree = options.tree || $('<div class="bt-wrapper"><nav class="tree"></div>');
     this.header = options.header || $('<header>');
     this._renderStructure();
     this._selectedEventBinder();

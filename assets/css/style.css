@@ -1,5 +1,36 @@
 /*  Base style for BackTree */
+/* Dimensions */
 /* Mixins */
+.backtree-footer-gradient {
+  background: #ffffff;
+  background: -moz-linear-gradient(top, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(3%, #e4e4e4), color-stop(100%, #dddddd));
+  background: -webkit-linear-gradient(top, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  background: -o-linear-gradient(top, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  background: -ms-linear-gradient(top, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  background: linear-gradient(to bottom, #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#dddddd', GradientType=0);
+}
+.backtree-selected-node-active-color {
+  background: #b6caca;
+  background: -moz-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #b6caca), color-stop(2%, #4d576d), color-stop(98%, #3c4352), color-stop(100%, #1b222f));
+  background: -webkit-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  background: -o-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  background: -ms-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  background: linear-gradient(to bottom, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#b6caca', endColorstr='#1b222f', GradientType=0);
+}
+.backtree-selected-node-color {
+  background: #edf2f2;
+  background: -moz-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #edf2f2), color-stop(2%, #606c88), color-stop(98%, #4b5366), color-stop(100%, #222a3a));
+  background: -webkit-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  background: -o-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  background: -ms-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  background: linear-gradient(to bottom, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#edf2f2', endColorstr='#222a3a', GradientType=0);
+}
 .visuallyhidden {
   position: absolute;
   overflow: hidden;
@@ -14,8 +45,17 @@
 #backtree {
   border-left: 2px solid #dddddd;
   border-right: 2px solid #dddddd;
+  overflow: hidden;
   /* Used for placing over the element */
 
+}
+#backtree .bt-wrapper {
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  bottom: 24px;
+  padding-bottom: 24px;
+  width: 100%;
 }
 #backtree ul {
   list-style: none;
@@ -191,6 +231,5 @@
   background-position: -24px -156px;
 }
 #backtree nav.tree {
-  overflow: auto;
   width: 100%;
 }

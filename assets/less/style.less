@@ -7,7 +7,44 @@
 @backtree-footer-background-color: #ddd;
 @backtree-footer-border-color: #d3d3d3;
 
+/* Dimensions */
+@backtree-height: 200px;
+@backtree-width: 400px;
+@backtree-header-height: 0;
+@backtree-footer-height: 24px;
+
 /* Mixins */
+.backtree-footer-gradient {
+  background: #ffffff;
+  background: -moz-linear-gradient(top,  #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(3%,#e4e4e4), color-stop(100%,#dddddd));
+  background: -webkit-linear-gradient(top,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
+  background: -o-linear-gradient(top,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
+  background: -ms-linear-gradient(top,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
+  background: linear-gradient(to bottom,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dddddd',GradientType=0 );
+}
+.backtree-selected-node-active-color {
+  background: #b6caca;
+  background: -moz-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#b6caca), color-stop(2%,#4d576d), color-stop(98%,#3c4352), color-stop(100%,#1b222f));
+  background: -webkit-linear-gradient(top, #b6caca 0%,#4d576d 2%,#3c4352 98%,#1b222f 100%);
+  background: -o-linear-gradient(top, #b6caca 0%,#4d576d 2%,#3c4352 98%,#1b222f 100%);
+  background: -ms-linear-gradient(top, #b6caca 0%,#4d576d 2%,#3c4352 98%,#1b222f 100%);
+  background: linear-gradient(to bottom, #b6caca 0%,#4d576d 2%,#3c4352 98%,#1b222f 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b6caca', endColorstr='#1b222f',GradientType=0 );
+}
+.backtree-selected-node-color {
+  background: #edf2f2;
+  background: -moz-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#edf2f2), color-stop(2%,#606c88), color-stop(98%,#4b5366), color-stop(100%,#222a3a));
+  background: -webkit-linear-gradient(top, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
+  background: -o-linear-gradient(top, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
+  background: -ms-linear-gradient(top, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
+  background: linear-gradient(to bottom, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#edf2f2', endColorstr='#222a3a',GradientType=0 );
+}
+
 .visuallyhidden {
   position: absolute;
   overflow: hidden;
@@ -18,12 +55,19 @@
   border: 0;
 }
 
-
 /* Actual Styles */
 #backtree {
   border-left: 2px solid @backtree-border;
   border-right: 2px solid @backtree-border;
-
+  overflow:hidden;
+  .bt-wrapper {
+    overflow: auto;
+    position: absolute;
+    top: @backtree-header-height;
+    bottom: @backtree-footer-height; 
+    padding-bottom: @backtree-footer-height; 
+    width: 100%;
+  }
   ul {
     list-style: none;
     padding-left: 0;
@@ -80,26 +124,11 @@
           margin-top:0;
         }
         .bt-node-selected:active {
-          background: #b6caca;
-          background: -moz-linear-gradient(top, #b6caca 0%, #4d576d 2%, #3c4352 98%, #1b222f 100%);
-          background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#b6caca), color-stop(2%,#4d576d), color-stop(98%,#3c4352), color-stop(100%,#1b222f));
-          background: -webkit-linear-gradient(top, #b6caca 0%,#4d576d 2%,#3c4352 98%,#1b222f 100%);
-          background: -o-linear-gradient(top, #b6caca 0%,#4d576d 2%,#3c4352 98%,#1b222f 100%);
-          background: -ms-linear-gradient(top, #b6caca 0%,#4d576d 2%,#3c4352 98%,#1b222f 100%);
-          background: linear-gradient(to bottom, #b6caca 0%,#4d576d 2%,#3c4352 98%,#1b222f 100%);
-          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b6caca', endColorstr='#1b222f',GradientType=0 );
-
+            .backtree-selected-node-active-color;
         }
         .bt-node-selected {
           color: white;
-          background: #edf2f2;
-          background: -moz-linear-gradient(top, #edf2f2 0%, #606c88 2%, #4b5366 98%, #222a3a 100%);
-          background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#edf2f2), color-stop(2%,#606c88), color-stop(98%,#4b5366), color-stop(100%,#222a3a));
-          background: -webkit-linear-gradient(top, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
-          background: -o-linear-gradient(top, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
-          background: -ms-linear-gradient(top, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
-          background: linear-gradient(to bottom, #edf2f2 0%,#606c88 2%,#4b5366 98%,#222a3a 100%);
-          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#edf2f2', endColorstr='#222a3a',GradientType=0 );
+          .backtree-selected-node-color;
           .bt-arrow {
             background-position: -96px -61px;
           }
@@ -126,25 +155,18 @@
   }
 
   header {
-    height: 0;
+    height: @backtree-header-height;
     border: 0;
   }
   footer {
     position: absolute;
     width: 100%;
     bottom: 0;
-    height: 24px;
+    height: @backtree-footer-height;
     background-color: @backtree-footer-background-color;
     border: 1px solid @backtree-footer-border-color; 
     border-width: 1px 0;
-    background: #ffffff;
-    background: -moz-linear-gradient(top,  #ffffff 0%, #e4e4e4 3%, #dddddd 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(3%,#e4e4e4), color-stop(100%,#dddddd));
-    background: -webkit-linear-gradient(top,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
-    background: -o-linear-gradient(top,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
-    background: -ms-linear-gradient(top,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
-    background: linear-gradient(to bottom,  #ffffff 0%,#e4e4e4 3%,#dddddd 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dddddd',GradientType=0 );
+    .backtree-footer-gradient;
 
     .right {
       float: right;
@@ -202,7 +224,6 @@
 
   }
   nav.tree {
-    overflow:auto;
     width: 100%;
   }
 
