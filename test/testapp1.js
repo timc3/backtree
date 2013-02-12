@@ -33,13 +33,6 @@ function nestCollection(model, attributeName, nestedCollection) {
  * We build the DOM from that structure.
  */
 var testModel = Backbone.Model.extend({
-  initialize: function(){
-    var contents = this.get('contents')
-    if (contents) {
-      this.contents = nestCollection(this, 'contents', new testCollection(contents));
-      this.unset("contents");
-    }
-  },
   defaults: {  
     id: '',
     name: '',
@@ -47,8 +40,17 @@ var testModel = Backbone.Model.extend({
   },
   url: function() {
     return this.get('url') + '?json';
-   },
+  },
+  /* Override to deal with adding nested collections */
+  set: function(attributes, options) {
+    var ret = Backbone.Model.prototype.set.call(this, attributes, options);
+    if (attributes.contents) {
+      this.contents = nestCollection(this, 'contents', new testCollection(this.get('contents')));
+      this.unset('contents');
 
+    }
+    return ret;
+  }
 });
 
 var testCollection = Backbone.Collection.extend({

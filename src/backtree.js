@@ -112,7 +112,7 @@ backtree.FooterView = backtree.View.extend({
 
   // Respond to add button
   addCollection: function(){
-    console.log('add new collection');
+    this.$el.trigger('add-new-collection');
   },
 
   // Response to remove button
@@ -144,7 +144,7 @@ backtree.TreeView = backtree.View.extend({
   selectedCollection: [],
 
   constructor: function(){
-    _.bindAll(this, "render");
+    _.bindAll(this, "render", "addNew");
     
     // We create a structure for the child.
     this.children = new Backbone.ChildViewContainer();
@@ -160,10 +160,14 @@ backtree.TreeView = backtree.View.extend({
       this.listenTo(this.collection, "add", this.addChildView, this);
       this.listenTo(this.collection, "remove", this.removeNodeView, this);
       this.listenTo(this.collection, "reset", this.render, this);
+      this.listenTo(this.collection, "change:contents", this.updateChildView, this);
     }
   },
 
-  events: {'remove-selected-collection': 'removeSelected'},
+  events: {
+    'remove-selected-collection': 'removeSelected',
+    'add-new-collection': 'addNew'
+  },
 
   initialize: function(options) {
     this.selectedCollection = [];
@@ -174,6 +178,9 @@ backtree.TreeView = backtree.View.extend({
     this.childTemplateRenderer = options.childTemplateRenderer || undefined;
     this.topicPrefix = options.topicPrefix || '/backtree/';
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator({topicPrefix: this.topicPrefix});
+    this.footer = options.footer || new backtree.FooterView();
+    this.tree = options.tree || $('<nav class="tree">');
+    this.header = options.header || $('<header>');
     this._renderStructure();
     this._selectedEventBinder();
 
@@ -189,22 +196,32 @@ backtree.TreeView = backtree.View.extend({
     var self=this;
     this.eventSubscribe('unselected', function(obj, collection){
       self.selectedCollection = _.reject(self.selectedCollection, function(viewObj){ if(viewObj.view.cid == obj.view.cid){ return viewObj;}});
-      if (self.selectedCollection.length === 0){  self.footer.disable(); }
+      if (self.selectedCollection.length === 0 && self.footer.hasOwnProperty('disable')){  
+        self.footer.disable(); 
+      }
     });
     this.eventSubscribe('selected', function(obj, collection){
       self.selectedCollection.push({view: obj.view, collection: collection});
-      if (self.selectedCollection.length > 0){  self.footer.enable(); }
+      if (self.selectedCollection.length > 0 && self.footer.hasOwnProperty('enable')){  self.footer.enable(); }
     });
   },
 
   // create the DOM structure that is needed for the tree.
   _renderStructure: function(){
+    var self = this,
+        renderHlpr = function(viewname){
+          if (viewname.hasOwnProperty('render')){
+            viewname.render()
+            return viewname.$el.appendTo(self.$el);
+          } else {
+            return $(viewname).appendTo(self.$el);
+          }
+        };
+
     this.$el.empty().addClass(this.className);
-    this.$headerEl = $('<header>').appendTo(this.$el);
-    this.$treeEl = $('<nav class="tree">').appendTo(this.$el);
-    this.footer = new backtree.FooterView();
-    this.footer.render();
-    this.footer.$el.appendTo(this.$el);
+    this.$headerEl = renderHlpr(this.header);
+    this.$treeEl = renderHlpr(this.tree);
+    this.$footerEl = renderHlpr(this.footer); 
   },
 
   render: function(){
@@ -218,13 +235,53 @@ backtree.TreeView = backtree.View.extend({
   /* Build up a view of the nodes in the collection. */
   buildCollectionView: function(){
     var self = this;
-
     // Iterate over the collection calling addNodeView
     this.collection.each(function(node, index){
       self.addNodeView(node, backtree.NodeView, index);
     });
   },
 
+  /* Handler for event for adding
+   * This should contain logic on where to put the new
+   * collection before calling addNew view, because we need to make sure that we
+   * maintain the correct dataStructure.
+   *
+   * */
+  addNew: function(event){
+    var _selectedCollection = this.selectedCollection,
+        newCollection = {
+          'type': 'collection',
+          'name': 'Untitled',
+          'state': 'closed'};
+    var newChildNode = {};
+        newChildNode[this.branchAttribute] = [newCollection];
+
+    // If not selected in the UI, add to the route collection, otherwise add it into the heirarchy.
+    if (_selectedCollection.length == 0){
+      this.collection.add(newCollection);
+    } else {
+
+      // Get the parentView, Check to see if it actually has the branch attribute, if not add it and the newCollection.
+      var _parentView = _selectedCollection[0];
+      _parentView.view.unselect();
+
+      if (!_parentView.collection.hasOwnProperty(this.branchAttribute)){
+        _parentView.collection.set(newChildNode);
+      } else {
+        _parentView.collection.contents.add(newCollection);
+      }
+    }
+  },
+
+  /* Update the child view for a change event */
+  updateChildView: function(event){
+    var view = this.children.findByModel(event);
+    if (view.collection === undefined){
+      view.collection = event[this.branchAttribute];
+      view._initialEvents()
+    }
+    view.render();
+  },
   /* Add a child view to the DOM */
   addChildView: function(item, collection, options){
     var index = this.collection.indexOf(item);
@@ -248,6 +305,7 @@ backtree.TreeView = backtree.View.extend({
 
     // Append to this views DOM.
     this.appendHTML(this, view, index);
+    
   },
 
   /* In separate function so that we can override it */
@@ -330,6 +388,7 @@ backtree.NodeView = backtree.TreeView.extend({
     this.templateRenderer = options.templateRenderer;
     this.collection = this.model[options.branchAttribute];
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator();
+    this.listenTo(this.model, 'select', function(){ this.select()}, this);  // Bind to select event (model is actually the wrapper for the collection).
   },
 
   render: function(){
@@ -397,6 +456,8 @@ backtree.NodeView = backtree.TreeView.extend({
   
   /* Handler for editing the name field of a collection from the DOM */
   editname: function(event){
+    event.preventDefault();  // Prevents the edit field from passing on the selection.
+    event.stopPropagation();
     var span = event.target || event.srcElement, self = this, 
         text = span.innerHTML,
         input = document.createElement("input");

@@ -1,5 +1,72 @@
 /*  Test scripts depend on Jasmine and Jasmine.JQuery */
 
+describe("Custom Footer View and Header View", function(){
+  beforeEach(function() {
+    myCollection = new testCollection(jsonstructure.contents);
+    customFooter = new Backtree.FooterView({
+      tagName: 'div',
+      className: 'testFooterClass' 
+    });
+    customHeader = new Backtree.FooterView({
+      tagName: 'div',
+      className: 'testHeaderClass'
+    });
+    tree = new Backtree.TreeView({
+        collection: myCollection,
+        className: 'backtree',
+        footer: customFooter,
+        header: customHeader,
+        childTemplateRenderer: function(model, view){
+          return ('<div>' + model.get('id') + '</div>');
+        } 
+    });
+  });
+
+  it("should have the footer defined correctly", function(){
+    expect(tree.$('div.testFooterClass').length).toBe(1);
+  });
+
+  it("should have the header defined correctly", function(){
+    expect(tree.$('div.testHeaderClass').length).toBe(1);
+  });
+
+  it("should store references to the DOM objects against the tree", function(){
+    expect(tree.hasOwnProperty('$footerEl')).toBe(true);
+    expect(tree.hasOwnProperty('$headerEl')).toBe(true);
+    expect(tree.hasOwnProperty('$treeEl')).toBe(true);
+  });
+
+});
+
+describe("Custom Footer View and Header View from JQuery object", function(){
+  beforeEach(function() {
+    myCollection = new testCollection(jsonstructure.contents);
+    tree = new Backtree.TreeView({
+        collection: myCollection,
+        className: 'backtree',
+        footer: $('<footer class="myFoot">'),
+        header: $('<header class="myOldHead">'),
+        childTemplateRenderer: function(model, view){
+          return ('<div>' + model.get('id') + '</div>');
+        } 
+    });
+  });
+
+  it("should have the footer defined correctly", function(){
+    expect(tree.$('footer.myFoot').length).toBe(1);
+  });
+
+  it("should have the header defined correctly", function(){
+    expect(tree.$('header.myOldHead').length).toBe(1);
+  });
+
+  it("should store references to the DOM objects against the tree", function(){
+    expect(tree.hasOwnProperty('$footerEl')).toBe(true);
+    expect(tree.hasOwnProperty('$headerEl')).toBe(true);
+    expect(tree.hasOwnProperty('$treeEl')).toBe(true);
+  });
+
+});
 describe("Bind to existing Element", function(){
   beforeEach(function() {
     myCollection = new testCollection(jsonstructure.contents);
@@ -16,9 +83,11 @@ describe("Bind to existing Element", function(){
     expect(tree).toBeDefined();
     expect(tree.children).toBeDefined();
   });
+
   it("should not be rendered until we call the render function", function(){
     expect(tree.$el).not.toContainHtml('<div>collection1</div>');
   });
+
   it("should render on to an element that we can create", function(){
     var newEl = $('<div>');
     $('#backtree').append(newEl);
@@ -268,6 +337,14 @@ describe("Basic Backtree Usage", function() {
         expect(tree.selectedCollection[0].hasOwnProperty('view')).toBe(true);
         expect(tree.selectedCollection[0].hasOwnProperty('collection')).toBe(true);
     });
+    it("should work with using an event on the collection", function(){
+        tree.collection.at(1).trigger('select');
+        var collectionEl1 = tree.$('div:contains("Collection 2")');
+        var collectionEl2 = tree.$('div:contains("A Sub Collection")');
+        expect(collectionEl1.hasClass('bt-node-selected')).toBe(true);
+        tree.collection.at(2).contents.at(0).trigger('select');
+        expect(collectionEl2.hasClass('bt-node-selected')).toBe(true);
+    });
   });
 
   describe("Should be able to edit the text of a collection", function(){
@@ -303,6 +380,19 @@ describe("Basic Backtree Usage", function() {
       collectionEl2.find('.contenteditable').click();
       expect(collectionEl1).not.toContainHtml('Collection 1');
       expect(collectionEl1).toContainHtml('ITWorks');
+    });
+  });
+
+  describe("Adding in child", function(){
+    // This is only going to work if your models are setup correctly. 
+    it("should work from adding in directly to the models", function(){
+      tree.collection.at(1).set({'contents': [{'name':'test child2'}]});
+      expect(tree.$el).toContainHtml('test child2');
+    });
+    it("should be able to add a child node", function(){
+      // With the test model structure the adding needs the contents attribute.
+      tree.collection.at(1).set({'contents': [{'name':'test2', 'type':'collection', url:'/', models:[], 'id':'3'}]});
+      expect(tree.$('div:contains("Collection 2")').parent('li').find('span:contains("test2")').length).toBe(1);
     });
   });
 
