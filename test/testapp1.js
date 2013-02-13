@@ -46,8 +46,7 @@ var testModel = Backbone.Model.extend({
     var ret = Backbone.Model.prototype.set.call(this, attributes, options);
     if (attributes.contents) {
       this.contents = nestCollection(this, 'contents', new testCollection(this.get('contents')));
-      this.unset('contents');
-
+      this.unset('contents', options);
     }
     return ret;
   }

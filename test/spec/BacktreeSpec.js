@@ -161,6 +161,11 @@ describe("Basic Backtree Usage", function() {
     expect(tree.$el).toContainHtml('A Sub Collection');
   });
 
+  it("should parse the structure", function(){
+    expect(tree.collection == myCollection).toBe(true);
+    expect(tree.children._views[_.keys(tree.children._views)[2]].collection == myCollection.at(2).contents).toBe(true);
+  });
+
   it("should add new childviews to the DOM correctly", function(){
     // This adds a relatively easy amendment.
     tree.collection.add([new testModel({
@@ -394,6 +399,16 @@ describe("Basic Backtree Usage", function() {
       tree.collection.at(1).set({'contents': [{'name':'test2', 'type':'collection', url:'/', models:[], 'id':'3'}]});
       expect(tree.$('div:contains("Collection 2")').parent('li').find('span:contains("test2")').length).toBe(1);
     });
+
+    it("should add a child of a child", function(){
+      var collectionEl1 = tree.$('div.bt-wrapper').find('div:contains("A Sub Collection")');
+      collectionEl1.click();
+      tree.$('.bt-ft-add-button').click();
+      expect(tree.collection.at(2).contents.at(0).contents.at(0).get('name')).toBe('Untitled');
+      var parent1 = tree.children._views[Object.keys(tree.children._views)[2]];
+      var parent2 = parent1.children._views[Object.keys(parent1.children._views)[0]];
+      expect(parent2.collection.length).toBe(1);
+      });
   });
 
   it("should be possible to add a node with a different type", function(){

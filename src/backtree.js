@@ -4,8 +4,19 @@ backtree = root.Backtree = {
   VERSION: "0.0.2",
 
   // check if we are using a mobile
-  isMobile: (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent))
+  isMobile: (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)),
+  
+  logger: {
+      loglevel: 3,
+      level:{ none: 0, debug: 1, warn: 3 },
+      log: function(mesg){
+          if(window.console && console.log){
+              console.log(mesg);   
+          }
+      } 
+  }
 }
+
 var EventCoordinator = backtree.EventCoordinator = function(options){
   this._configure(options || {});
 };
@@ -174,7 +185,7 @@ backtree.TreeView = backtree.View.extend({
     this.className = options.className || "backtree";
     this.stateAttribute = options.stateAttribute || "state";
     this.branchAttribute = options.branchAttribute || "contents";
-    this.nameAttribute = options.nameAttribute || "name";
+    this.nameAttribute = options.branchAttribute || "name";
     this.collection = options.collection;
     this.childTemplateRenderer = options.childTemplateRenderer || undefined;
     this.topicPrefix = options.topicPrefix || '/backtree/';
@@ -228,7 +239,7 @@ backtree.TreeView = backtree.View.extend({
   render: function(){
     if (this.collection && this.collection.length > 0) {
       this.buildCollectionView();
-    } 
+    }
     this.trigger("rendered");
     return this;
   },
@@ -259,30 +270,36 @@ backtree.TreeView = backtree.View.extend({
 
     // If not selected in the UI, add to the route collection, otherwise add it into the heirarchy.
     if (_selectedCollection.length == 0){
+      // Add to route collection.
       this.collection.add(newCollection);
     } else {
-
       // Get the parentView, Check to see if it actually has the branch attribute, if not add it and the newCollection.
       var _parentView = _selectedCollection[0];
       _parentView.view.unselect();
-
-      if (!_parentView.collection.hasOwnProperty(this.branchAttribute)){
-        _parentView.collection.set(newChildNode);
-      } else {
-        _parentView.collection.contents.add(newCollection);
+      if (!_parentView.hasOwnProperty('children')){
+         _parentView.children = new Backbone.ChildViewContainer();
       }
+      if (!_parentView.collection.hasOwnProperty(this.branchAttribute)){
+        var updated = _parentView.collection.set(newChildNode, {silent: true});
+        _parentView.view.collection = updated.contents;
+      } else {
+        _parentView.collection[this.branchAttribute].add(newCollection);
+      } 
+      _parentView.view.render();
     }
   },
 
   /* Update the child view for a change event */
-  updateChildView: function(event){
-    var view = this.children.findByModel(event);
+  updateChildView: function(parentModel){
+    console.log('updateChildView');
+    var view = this.children.findByModel(parentModel);
     if (view.collection === undefined){
-      view.collection = event[this.branchAttribute];
+      view.collection = parentModel[this.branchAttribute];
       view._initialEvents()
     }
     view.render();
   },
+  
   /* Add a child view to the DOM */
   addChildView: function(item, collection, options){
     var index = this.collection.indexOf(item);
@@ -295,7 +312,6 @@ backtree.TreeView = backtree.View.extend({
         model: node, 
         parentView: this, 
         branchAttribute: this.branchAttribute,
-        nameAttribute: this.nameAttribute,
         templateRenderer: this.childTemplateRenderer,
         eventCoordinator: this.eventCoordinator,
         topicPrefix: this.topicPrefix
@@ -356,6 +372,16 @@ backtree.TreeView = backtree.View.extend({
   }
 });
 
+
+
+
+
+
+
+
+
+
+
 backtree.NodeView = backtree.TreeView.extend({
   /* Collection Node View. Used for rendering the branches as Child Views to the main structure
    * 
@@ -364,7 +390,7 @@ backtree.NodeView = backtree.TreeView.extend({
   template: _.template('<li><div class="bt-node">\
       <div class="bt-arrow <% if (state != undefined && state === "open"){ %>bt-arrow-open<% } %>">\
       </div><div class="bt-icon bt-icon-<%= type %>">\
-      </div><span class="contenteditable"><%= this.model.get(this.nameAttribute) %></span></div></li>'),
+      </div><span class="contenteditable"><%= name||id %></span></div></li>'),
   
   /* Events check for mobile compatibility */
   events: function(){
@@ -389,12 +415,11 @@ backtree.NodeView = backtree.TreeView.extend({
   initialize: function(options){
     this.templateRenderer = options.templateRenderer;
     this.collection = this.model[options.branchAttribute];
-    this.nameAttribute = options.nameAttribute;
     this.eventCoordinator = options.eventCoordinator || new backtree.EventCoordinator();
     this.listenTo(this.model, 'select', function(){ this.select()}, this);  // Bind to select event (model is actually the wrapper for the collection).
   },
 
-  render: function(){
+  render: function(event){
     var html = this.returnRendered();
     this.$el.addClass('bt-branch').html(html).attr('data-id', this.model.cid);
     this.renderCollection();
@@ -419,14 +444,13 @@ backtree.NodeView = backtree.TreeView.extend({
   },
 
   appendHTML: function(collectionView, nodeView){
-    var typeicon = "bt-icon-" + this.model.get('type') + "-open";
     collectionView.$("li:first")
         .append(nodeView.el)
         .find("div.bt-arrow:first")
         .addClass("bt-arrow-open")
         .end()
         .find("div.bt-icon:first")
-        .addClass(typeicon);
+        .addClass("bt-icon-collection-open");
   },
 
   /* Handler for selecting this collection */
@@ -449,6 +473,7 @@ backtree.NodeView = backtree.TreeView.extend({
   /* Hander for unselecting this collection */
   unselect: function(event){
     var selected = this.$('.bt-node:first').removeClass('bt-node-selected');
+    this.eventUnSubscribe('selected', this.selectEventHandler);
     this.eventPublish('unselected', {view: this}, this.model);
   },
 
