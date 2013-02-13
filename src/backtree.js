@@ -419,13 +419,14 @@ backtree.NodeView = backtree.TreeView.extend({
   },
 
   appendHTML: function(collectionView, nodeView){
+    var typeicon = "bt-icon-" + this.model.get('type') + "-open";
     collectionView.$("li:first")
         .append(nodeView.el)
         .find("div.bt-arrow:first")
         .addClass("bt-arrow-open")
         .end()
         .find("div.bt-icon:first")
-        .addClass("bt-icon-collection-open");
+        .addClass(typeicon);
   },
 
   /* Handler for selecting this collection */

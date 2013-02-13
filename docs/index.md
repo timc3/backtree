@@ -1,4 +1,4 @@
-# BackTree
+# Backtree
 
 This is documentation for Backtree Version 0.0.2
 

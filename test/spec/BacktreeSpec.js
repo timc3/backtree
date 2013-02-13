@@ -396,6 +396,15 @@ describe("Basic Backtree Usage", function() {
     });
   });
 
+  it("should be possible to add a node with a different type", function(){
+    tree.collection.models[2].contents.add([new testModel({
+      id: 'testDeeper',
+      name: 'Test Addition',
+      type: 'customtypeattribute'
+    })]); 
+    expect(tree.$el.find('div.bt-icon-customtypeattribute').length).toBe(1);
+  });
+
   it("should be able to put something a little deeper using the API.", function(){
     tree.collection.models[2].contents.add([new testModel({
       id: 'testDeeper',
@@ -404,5 +413,4 @@ describe("Basic Backtree Usage", function() {
     })]); 
     expect(tree.$el).toContainHtml('Test Addition');
   });
-
 });
