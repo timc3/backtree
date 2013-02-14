@@ -282,16 +282,17 @@ backtree.TreeView = backtree.View.extend({
       if (!_parentView.collection.hasOwnProperty(this.branchAttribute)){
         var updated = _parentView.collection.set(newChildNode, {silent: true});
         _parentView.view.collection = updated.contents;
+        _parentView.view._initialEvents()  // Bind events on the new collection.
+        _parentView.view.addNodeView(updated.contents.at(0), backtree.NodeView);
       } else {
-        _parentView.collection[this.branchAttribute].add(newCollection);
+        var updated = _parentView.collection[this.branchAttribute].add(newCollection);
+        //_parentView.view.addNodeView(updated, backtree.NodeView);
       } 
-      _parentView.view.render();
     }
   },
 
   /* Update the child view for a change event */
   updateChildView: function(parentModel){
-    console.log('updateChildView');
     var view = this.children.findByModel(parentModel);
     if (view.collection === undefined){
       view.collection = parentModel[this.branchAttribute];
@@ -302,6 +303,7 @@ backtree.TreeView = backtree.View.extend({
   
   /* Add a child view to the DOM */
   addChildView: function(item, collection, options){
+      console.log('addChildView');
     var index = this.collection.indexOf(item);
     this.addNodeView(item, backtree.NodeView, index);
   },

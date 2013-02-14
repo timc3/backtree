@@ -408,7 +408,10 @@ describe("Basic Backtree Usage", function() {
       var parent1 = tree.children._views[Object.keys(tree.children._views)[2]];
       var parent2 = parent1.children._views[Object.keys(parent1.children._views)[0]];
       expect(parent2.collection.length).toBe(1);
-      });
+    });
+    it("should allow adding of siblings that don't require that branch to be overwritten", function(){
+
+    });
   });
 
   it("should be possible to add a node with a different type", function(){
