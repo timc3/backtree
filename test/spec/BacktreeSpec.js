@@ -306,7 +306,7 @@ describe("Basic Backtree Usage", function() {
       collectionEl.click();
       expect(x).not.toBe({});
       expect(y).not.toBe({});
-      expect(Object.getPrototypeOf(x.view) === backtree.NodeView.prototype).toBe(true);
+      expect(Object.getPrototypeOf(x.view) === Backtree.NodeView.prototype).toBe(true);
       expect(Object.getPrototypeOf(y) === testModel.prototype).toBe(true);
     });
     it("selecting node view should listen to other select events so that we can unselect this", function(){

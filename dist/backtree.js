@@ -1,3 +1,6 @@
+/* Backtree. Copyright 2013. Tim Child, All Rights Reserved.
+ * For source and license please see http://github.com/timc3/backtree/ - Released under Creative Commons Attribution-ShareAlike 3.0 Unported License
+ */
 (function (root, $, _, Backbone) {
 var window = root;
 
