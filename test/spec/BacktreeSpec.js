@@ -388,6 +388,35 @@ describe("Basic Backtree Usage", function() {
     });
   });
 
+    it("Deleting a sibling shouldn't cause addition of new sibling to fail", function(){
+      var press = jQuery.Event('keydown'); press.ctrlKey = false; press.which = 13; 
+      var collectionEl1 = tree.$('div.bt-wrapper').find('div:contains("A Sub Collection")');
+      collectionEl1.click();
+      tree.$('.bt-ft-add-button').click();
+      expect(tree.$('div.bt-wrapper')).toContainHtml('Untitled');
+      var collectionEl2 = tree.$('div.bt-wrapper').find('div:contains("Untitled")');
+      collectionEl2.find('.contenteditable').click();
+      var inputEl2 = collectionEl2.find('input').val('testdeletereadd1');
+      inputEl2.trigger(press);
+      expect(tree.$('div.bt-wrapper')).toContainHtml('testdeletereadd1');
+      collectionEl1.click();
+      tree.$('.bt-ft-add-button').click();
+      var collectionEl3 = tree.$('div.bt-wrapper').find('div:contains("Untitled")');
+      collectionEl3.find('.contenteditable').click();
+      var inputEl3 = collectionEl3.find('input').val('testdeletereadd2'); inputEl3.trigger(press);
+      collectionEl2.click();
+      tree.$('.bt-ft-remove-button').click();
+      expect(tree.$('div.bt-wrapper')).toContainHtml('testdeletereadd2');
+      expect(tree.$('div.bt-wrapper')).not.toContainHtml('testdeletereadd1');
+      // Now we try and add another node.
+      var collectionEl1 = tree.$('div.bt-wrapper').find('div:contains("A Sub Collection")');
+      collectionEl1.click(); 
+      tree.$('.bt-ft-add-button').click();
+      var collectionEl4 = tree.$('div.bt-wrapper').find('div:contains("Untitled")');
+      expect(tree.$('div.bt-wrapper')).toContainHtml('Untitled');
+      expect(collectionEl4.length).toBe(1);
+    });
+
   describe("Adding in child", function(){
     // This is only going to work if your models are setup correctly. 
     it("should work from adding in directly to the models", function(){
@@ -410,7 +439,17 @@ describe("Basic Backtree Usage", function() {
       expect(parent2.collection.length).toBe(1);
     });
     it("should allow adding of siblings that don't require that branch to be overwritten", function(){
-
+      var press = jQuery.Event('keydown'); press.ctrlKey = false; press.which = 13; 
+      var collectionEl1 = tree.$('div.bt-wrapper').find('div:contains("A Sub Collection")');
+      collectionEl1.click();
+      tree.$('.bt-ft-add-button').click();
+      var collectionEl2 = tree.$('div.bt-wrapper').find('div:contains("Untitled")');
+      collectionEl2.find('.contenteditable').click();
+      var inputEl2 = collectionEl2.find('input').val('dontoverwrite');
+      inputEl2.trigger(press);
+      collectionEl1.click();
+      tree.$('.bt-ft-add-button').click();
+      expect(tree.$('div.bt-wrapper')).toContainHtml('dontoverwrite');
     });
   });
 

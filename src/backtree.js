@@ -280,30 +280,30 @@ backtree.TreeView = backtree.View.extend({
          _parentView.children = new Backbone.ChildViewContainer();
       }
       if (!_parentView.collection.hasOwnProperty(this.branchAttribute)){
-        var updated = _parentView.collection.set(newChildNode, {silent: true});
+        var updated = _parentView.collection.set(newChildNode);
         _parentView.view.collection = updated.contents;
         _parentView.view._initialEvents()  // Bind events on the new collection.
         _parentView.view.addNodeView(updated.contents.at(0), backtree.NodeView);
       } else {
         var updated = _parentView.collection[this.branchAttribute].add(newCollection);
-        //_parentView.view.addNodeView(updated, backtree.NodeView);
       } 
     }
   },
 
   /* Update the child view for a change event */
-  updateChildView: function(parentModel){
-    var view = this.children.findByModel(parentModel);
-    if (view.collection === undefined){
-      view.collection = parentModel[this.branchAttribute];
-      view._initialEvents()
+  updateChildView: function(model, value, options){
+    var self=this, view = this.children.findByModel(model);
+    if (model[self.branchAttribute] !== undefined){ 
+        if (view.collection === undefined){
+          view.collection = model[self.branchAttribute];
+          view._initialEvents()
+        }
+        view.render();
     }
-    view.render();
   },
   
   /* Add a child view to the DOM */
   addChildView: function(item, collection, options){
-      console.log('addChildView');
     var index = this.collection.indexOf(item);
     this.addNodeView(item, backtree.NodeView, index);
   },
@@ -333,8 +333,8 @@ backtree.TreeView = backtree.View.extend({
     collectionView.$treeEl.append(nodeView.el);
   },
 
-  removeNodeView: function(node){ 
-    view = this.children.findByModel(node);
+  removeNodeView: function(node){
+    var view = this.children.findByModel(node);
     if (this.selectedCollection[0] !== undefined && this.selectedCollection[0].collection.cid === node.cid){
       this.selectedCollection.pop(0);
       this.footer.disable();
@@ -344,7 +344,7 @@ backtree.TreeView = backtree.View.extend({
 
   removeSelected: function(){
     if (this.selectedCollection[0] !== undefined && this.selectedCollection[0].hasOwnProperty('collection')){
-      this.selectedCollection[0].collection.destroy();
+       this.selectedCollection[0].view.model.destroy();
     }
   },
 

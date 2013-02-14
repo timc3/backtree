@@ -44,12 +44,13 @@ var testModel = Backbone.Model.extend({
   /* Override to deal with adding nested collections */
   set: function(attributes, options) {
     var ret = Backbone.Model.prototype.set.call(this, attributes, options);
-    if (attributes.contents) {
+    if (attributes.contents && !this.contents) {
       this.contents = nestCollection(this, 'contents', new testCollection(this.get('contents')));
       this.unset('contents', options);
     }
     return ret;
-  }
+  },
+
 });
 
 var testCollection = Backbone.Collection.extend({
