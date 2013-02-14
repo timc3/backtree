@@ -273,9 +273,9 @@ var TreeView = Backtree.TreeView = Backtree.View.extend({
       }
       if (!_parentView.collection.hasOwnProperty(this.branchAttribute)){
         var updated = _parentView.collection.set(newChildNode);
-        _parentView.view.collection = updated.contents;
+        _parentView.view.collection = updated[this.branchAttribute];
         _parentView.view._initialEvents()  // Bind events on the new collection.
-        _parentView.view.addNodeView(updated.contents.at(0), Backtree.NodeView);
+        _parentView.view.addNodeView(updated[this.branchAttribute].at(0), Backtree.NodeView);
       } else {
         var updated = _parentView.collection[this.branchAttribute].add(newCollection);
       } 
@@ -400,6 +400,7 @@ var NodeView = Backtree.NodeView = Backtree.TreeView.extend({
   },
 
   initialize: function(options){
+    this.branchAttribute = options.branchAttribute;
     this.templateRenderer = options.templateRenderer;
     this.collection = this.model[options.branchAttribute];
     this.eventCoordinator = options.eventCoordinator || new Backtree.EventCoordinator();

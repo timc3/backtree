@@ -414,7 +414,7 @@ describe("Basic Backtree Usage", function() {
       tree.$('.bt-ft-add-button').click();
       var collectionEl4 = tree.$('div.bt-wrapper').find('div:contains("Untitled")');
       expect(tree.$('div.bt-wrapper')).toContainHtml('Untitled');
-      expect(collectionEl4.length).toBe(1);
+      expect(collectionEl4.length).toBe(2);
     });
 
   describe("Adding in child", function(){
