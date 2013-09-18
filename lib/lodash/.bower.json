@@ -1,0 +1,30 @@
+{
+  "name": "lodash",
+  "version": "1.2.0",
+  "main": "./lodash.js",
+  "ignore": [
+    ".*",
+    "*.custom.*",
+    "*.d.ts",
+    "*.md",
+    "*.txt",
+    "build.js",
+    "index.js",
+    "build",
+    "doc",
+    "node_modules",
+    "perf",
+    "test",
+    "vendor"
+  ],
+  "homepage": "https://github.com/bestiejs/lodash",
+  "_release": "1.2.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.2.0",
+    "commit": "d52cb79c893ccd4503aa294ef0d4f08926457588"
+  },
+  "_source": "git://github.com/bestiejs/lodash.git",
+  "_target": "1.2.0",
+  "_originalSource": "lodash"
+}
