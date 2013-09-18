@@ -1,0 +1,30 @@
+{
+  "name": "backtree",
+  "version": "0.0.4",
+  "homepage": "https://github.com/timc3/backtree",
+  "authors": [
+    "Tim Child <tim@timc3.com>"
+  ],
+  "description": "backtree is a tree component that uses backbone.js models and collections",
+  "main": "./dist/backtree.js",
+  "keywords": [
+    "backtree",
+    "backbonejs"
+  ],
+  "license": "Creative Commons Attribution-ShareAlike 3.0 Unported License",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "examples",
+    "assets"
+  ],
+  "dependencies": {
+    "jquery": ">=1.7.2",
+    "lodash": "1.0.0-rc.3",
+    "backbone": ">=0.9.10",
+    "backbone.babysitter": "0.0.4"
+  }
+}
