@@ -2,7 +2,7 @@
 var window = root;
 
 var Backtree = root.Backtree = {
-  VERSION: "0.0.3",
+  VERSION: "0.0.4",
 
   // check if we are using a mobile
   isMobile: (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)),
