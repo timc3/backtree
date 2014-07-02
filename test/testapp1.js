@@ -1,5 +1,6 @@
 /*
  * GIST from https://gist.github.com/geddesign/1610397
+ * Now it looks like the gist has moved to https://gist.github.com/geddski/1610397
  */
 function nestCollection(model, attributeName, nestedCollection) {
   //setup nested references
