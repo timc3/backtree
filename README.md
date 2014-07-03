@@ -26,7 +26,7 @@ For IE8 and above you should use a shim for HTML5 tag support
 * **JQuery** >= 1.7.2
 * **Underscore** 1.4.3 or **LoDash with Underscore** 1.0.0-rc.3
 * **Backbone.js** == 0.9.10 
-* **Backbone Babysitter** == 0.0.4
+* **Backbone Babysitter** == 0.1.4
 
 It also currently requires a Javascript PubSub implementation (Included is a modified version of pubsub.js).
 

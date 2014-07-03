@@ -1,16 +1,18 @@
 # Backbone.BabySitter
 
+[![Build Status](https://travis-ci.org/marionettejs/backbone.babysitter.svg?branch=master)](https://travis-ci.org/marionettejs/backbone.babysitter)
+
 Manage child views in a Backbone.View.
 
 ## About Backbone.BabySitter
 
-Backbone provides a lot of functionality in it's views, but does not directly
+Backbone provides a lot of functionality in its views, but does not directly
 provide a way to manage child views or nested views. This is not terribly
 difficult to do on your own, but it gets tedious to write the same code
 over and over again.
 
 Backbone.BabySitter provides a simple way to manage an unknown number of
-child views within a Backbone.View, or other object that needst to track a
+child views within a Backbone.View, or other object that needs to track a
 list of views.
 
 ## Downloads And Source
@@ -18,17 +20,9 @@ list of views.
 Grab the source from the `src` folder above. Grab the most recent builds
 from the links below.
 
-### Standard Builds
-
 * Development: [backbone.babysitter.js](https://raw.github.com/marionettejs/backbone.babysitter/master/lib/backbone.babysitter.js)
 
 * Production: [backbone.babysitter.min.js](https://raw.github.com/marionettejs/backbone.babysitter/master/lib/backbone.babysitter.min.js)
-
-### RequireJS (AMD) Builds
-
-* Development: [backbone.babysitter.js](https://raw.github.com/marionettejs/backbone.babysitter/master/lib/amd/backbone.babysitter.js)
-
-* Production: [backbone.babysitter.min.js](https://raw.github.com/marionettejs/backbone.babysitter/master/lib/amd/backbone.babysitter.min.js)
 
 ## Documentation
 
@@ -51,10 +45,9 @@ Views will be stored once and indexed in several ways:
 
 * by `view.cid`
 * by `view.model.cid` if the view has a model
-* by `view.collection.cid` if the view has a collection
 * by a custom index key
 
-When adding a view, you can optionally specify a custom index key 
+When adding a view, you can optionally specify a custom index key
 by which you can later retrieve the view.
 
 ```js
@@ -93,8 +86,8 @@ var s = container.findByCid(someView.cid);
 // find by model
 var av = container.findByModel(anotherView.model);
 
-// find by collection
-var cv = container.findByCollection(collectionView.collection);
+// find by model cid
+var av2 = container.findByModelCid(anotherView.model.cid);
 
 // find by custom key
 var custv = container.findByCustom("an indexer");
@@ -113,7 +106,7 @@ indexes.
 ```js
 var container = new Backbone.ChildViewContainer();
 
-continer.add(view);
+container.add(view);
 
 // some time later
 container.remove(view);
@@ -159,8 +152,8 @@ will not be called on that view. No errors will be thrown in this situation.
 
 ### Get The Number Of Stored Views
 
-To get the number of stored views, call the `container.length` 
-attribute. This attribute is updated any time a view is added or 
+To get the number of stored views, call the `container.length`
+attribute. This attribute is updated any time a view is added or
 removed.
 
 ```js
@@ -218,7 +211,7 @@ container.add(v3);
 
 // iterate over all of the views
 container.each(function(view){
-  
+
   // process each view individually, here
 
 });
@@ -234,3 +227,9 @@ file.
 ## License
 
 MIT - see [LICENSE.md](https://github.com/marionettejs/backbone.babysitter/blob/master/LICENSE.md)
+
+## Dev
+
+* `npm install`
+* `npm install -g grunt-cli`
+* `grunt`

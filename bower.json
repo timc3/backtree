@@ -1,6 +1,6 @@
 {
   "name": "backtree",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "homepage": "https://github.com/timc3/backtree",
   "authors": [
     "Tim Child <tim@timc3.com>"
@@ -25,7 +25,7 @@
   "dependencies": {
     "jquery": ">=1.7.2",
     "backbone": ">=0.9.10",
-    "backbone.babysitter": ">=0.0.4",
+    "backbone.babysitter": ">=0.1.4",
     "lodash": ">=1.2.0"
   }
 }
