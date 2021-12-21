@@ -1,6 +1,9 @@
-# Backtree.js
+# Backtree.js - Archived
 
 ***
+
+**This project has now been archived and I don't suggest using it any more**
+
 
 Is a tree component that uses Backbone.js for building a tree naviation system based on Backbone nested collections.
 
